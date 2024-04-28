@@ -1,0 +1,37 @@
+# CLion specific
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Executables and Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.obj
+*.lib
+*.out
+*.pdb
+*.ilk
+*.dSYM/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Ignore all log files and directories
+*.log
+logs/
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Operating system files
+.DS_Store
+Thumbs.db
