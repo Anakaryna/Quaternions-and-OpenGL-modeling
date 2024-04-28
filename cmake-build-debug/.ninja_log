@@ -1,0 +1,6 @@
+# ninja log v5
+9	266	7360430053886569	CMakeFiles/main.dir/Camera.cpp.obj	e7d8f5ba9c79c398
+17	885	7360430060099541	CMakeFiles/main.dir/Block.cpp.obj	5c9bc36f76cd1655
+4	1034	7360430061590254	CMakeFiles/main.dir/main.cpp.obj	953496752f6d9af2
+13	1241	7360430063654945	CMakeFiles/main.dir/Map.cpp.obj	281bd7c02de82840
+1242	1357	7360430064780065	main.exe	b66a710ef50eb360
