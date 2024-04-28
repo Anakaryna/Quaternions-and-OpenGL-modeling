@@ -1,3 +1,0 @@
-C:/Users/Anamaria/Documents/ESGI/3rdYear/Semestre 2/Maths/Projet/Quaternions-and-OpenGL-modeling/cmake-build-debug/CMakeFiles/main.dir
-C:/Users/Anamaria/Documents/ESGI/3rdYear/Semestre 2/Maths/Projet/Quaternions-and-OpenGL-modeling/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Anamaria/Documents/ESGI/3rdYear/Semestre 2/Maths/Projet/Quaternions-and-OpenGL-modeling/cmake-build-debug/CMakeFiles/rebuild_cache.dir
