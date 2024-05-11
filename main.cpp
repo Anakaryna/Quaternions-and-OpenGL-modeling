@@ -5,6 +5,7 @@
 
 #include "include/Camera.h"
 #include "include/Map.h"
+#include "include/Quaternion.h"
 
 
 // Objet Camera
@@ -50,6 +51,24 @@ void KeyboardDown(unsigned char key, int xx, int yy)
         case 'q':
             cam->deltaStrafe = 1;
             break;
+        case 'p': // Test Quaternion operations
+        {
+            Quaternion q1(1, 2, 3, 4);
+            Quaternion q2(2, 3, 4, 1);
+            Quaternion sum = q1 + q2;
+            Quaternion product = q1 * q2;
+            Quaternion conjugated = q1.conjugate();
+            std::cout << "Q1: " << q1 << std::endl;
+            std::cout << "Q2: " << q2 << std::endl;
+            std::cout << "Somme: " << sum << std::endl;
+            std::cout << "Produit: " << product << std::endl;
+            std::cout << "Conjugué de Q1: " << conjugated << std::endl;
+            std::cout << "Norme Q1: " << q1.norm() << std::endl;
+            std::cout << "Quaternion unitaire de Q1: " << q1.normalize() << std::endl;
+            float dotProduct = q1.dot(q2);
+            std::cout << "Produit scalaire de Q1 et Q2: " << dotProduct << std::endl;
+            break;
+        }
     }
 }
 void KeyboardUp(unsigned char key, int xx, int yy)
@@ -185,6 +204,8 @@ int main(int argc, char **argv)
     glEnable(GL_TEXTURE_2D);
 
     glutMainLoop();
+
+
 
     return (1);
 }
