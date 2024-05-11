@@ -62,7 +62,7 @@ void KeyboardDown(unsigned char key, int xx, int yy)
             std::cout << "Q2: " << q2 << std::endl;
             std::cout << "Somme: " << sum << std::endl;
             std::cout << "Produit: " << product << std::endl;
-            std::cout << "Conjugué de Q1: " << conjugated << std::endl;
+            std::cout << "Conjugue de Q1: " << conjugated << std::endl;
             std::cout << "Norme Q1: " << q1.norm() << std::endl;
             std::cout << "Quaternion unitaire de Q1: " << q1.normalize() << std::endl;
             float dotProduct = q1.dot(q2);
