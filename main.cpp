@@ -2,6 +2,7 @@
 #include <SOIL/SOIL.h>
 #include <cstdio>
 #include <cmath>
+#include <iomanip>
 
 #include "include/Camera.h"
 #include "include/Map.h"
@@ -67,8 +68,58 @@ void KeyboardDown(unsigned char key, int xx, int yy)
             std::cout << "Quaternion unitaire de Q1: " << q1.normalize() << std::endl;
             float dotProduct = q1.dot(q2);
             std::cout << "Produit scalaire de Q1 et Q2: " << dotProduct << std::endl;
+            float matrix1[16];
+            float matrix2[16];
+            float resultMatrix[16];
+            q1.to4x4Matrix(matrix1);
+            q2.to4x4Matrix(matrix2);
+            Quaternion::multiplyMatrices4x4(matrix1, matrix2, resultMatrix);
+
+            std::cout << "Matrice 4x4 pour q1:" << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    std::cout << std::setw(10) << matrix1[i * 4 + j] << " ";
+                }
+                std::cout << std::endl;
+            }
+
+            std::cout << "Matrice 4x4 pour q2:" << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    std::cout << std::setw(10) << matrix2[i * 4 + j] << " ";
+                }
+                std::cout << std::endl;
+            }
+
+            std::cout << "Produit des matrices 4x4 de q1 et q2:" << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    std::cout << std::setw(10) << resultMatrix[i * 4 + j] << " ";
+                }
+                std::cout << std::endl;
+            }
+
+            Quaternion q_from_matrix = Quaternion::from4x4Matrix(resultMatrix);
+            std::cout << "Quaternion reconstruit a partir de la matrice resultat: " << q_from_matrix << std::endl;
+
+            // Test de conversion quaternion <-> matrice de rotation 3x3
+            float rotationMatrix[9];
+            q1.toRotationMatrix3x3(rotationMatrix);
+            std::cout << "Matrice de rotation 3x3 pour q1:" << std::endl;
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    std::cout << std::setw(10) << rotationMatrix[i * 3 + j] << " ";
+                }
+                std::cout << std::endl;
+            }
+
+            Quaternion q_from_rotation_matrix = Quaternion::fromRotationMatrix3x3(rotationMatrix);
+            std::cout << "Quaternion reconstruit a partir de la matrice de rotation: " << q_from_rotation_matrix << std::endl;
+            
             break;
         }
+
+
     }
 }
 void KeyboardUp(unsigned char key, int xx, int yy)

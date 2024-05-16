@@ -29,6 +29,21 @@ public:
     // Calcule le produit scalaire de deux quaternions
     float dot(const Quaternion& q) const;
 
+    // Passage d'un quaternion en matrice
+    void to4x4Matrix(float matrix[16]) const;
+
+    // Passage d'une matrice en quaternion
+    static Quaternion from4x4Matrix(const float matrix[16]);
+
+    // Multiplication de deux matrices 4x4
+    static void multiplyMatrices4x4(const float mat1[16], const float mat2[16], float result[16]);
+
+    // Conversion d'un quaternion en matrice de rotation 3x3
+    void toRotationMatrix3x3(float matrix[9]) const;
+
+    // Conversion d'une matrice de rotation 3x3 en quaternion
+    static Quaternion fromRotationMatrix3x3(const float matrix[9]);
+
     // Affichage du quaternion, utile pour le débogage
     friend std::ostream& operator<<(std::ostream& os, const Quaternion& q);
 };
