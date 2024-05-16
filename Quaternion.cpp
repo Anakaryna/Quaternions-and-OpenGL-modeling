@@ -32,13 +32,11 @@ float Quaternion::dot(const Quaternion& q) const {
     return w * q.w + x * q.x + y * q.y + z * q.z;
 }
 
-// Affichage d'un quaternion
 void Quaternion::to4x4Matrix(float matrix[16]) const {
-    float a = w, b = x, c = y, d = z;
-    matrix[0] = a;  matrix[1] = -b; matrix[2] = -c; matrix[3] = -d;
-    matrix[4] = b;  matrix[5] = a;  matrix[6] = -d; matrix[7] = c;
-    matrix[8] = c;  matrix[9] = d;  matrix[10] = a; matrix[11] = -b;
-    matrix[12] = d; matrix[13] = -c; matrix[14] = b; matrix[15] = a;
+    matrix[0] = w;  matrix[1] = -x; matrix[2] = -y; matrix[3] = -z;
+    matrix[4] = x;  matrix[5] = w;  matrix[6] = -z; matrix[7] = y;
+    matrix[8] = y;  matrix[9] = z;  matrix[10] = w; matrix[11] = -x;
+    matrix[12] = z; matrix[13] = -y; matrix[14] = x; matrix[15] = w;
 }
 
 Quaternion Quaternion::from4x4Matrix(const float matrix[16]) {
@@ -48,6 +46,8 @@ Quaternion Quaternion::from4x4Matrix(const float matrix[16]) {
     float d = matrix[12]; // d
     return Quaternion(a, b, c, d);
 }
+
+
 
 void Quaternion::multiplyMatrices4x4(const float mat1[16], const float mat2[16], float result[16]) {
     for (int i = 0; i < 4; ++i) {
