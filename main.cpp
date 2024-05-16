@@ -2,6 +2,7 @@
 #include <SOIL/SOIL.h>
 #include <cstdio>
 #include <cmath>
+#include <iomanip>
 
 #include "include/Camera.h"
 #include "include/Map.h"
@@ -67,6 +68,17 @@ void KeyboardDown(unsigned char key, int xx, int yy)
             std::cout << "Quaternion unitaire de Q1: " << q1.normalize() << std::endl;
             float dotProduct = q1.dot(q2);
             std::cout << "Produit scalaire de Q1 et Q2: " << dotProduct << std::endl;
+            float matrix[16];
+            q1.to4x4Matrix(matrix);
+            std::cout << "Matrice 4x4 pour q1:" << std::endl;
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    std::cout << std::setw(10) << matrix[i * 4 + j] << " ";
+                }
+                std::cout << std::endl;
+            }
+            Quaternion q_from_matrix = Quaternion::from4x4Matrix(matrix);
+            std::cout << "Quaternion reconstruit a partir de la matrice: " << q_from_matrix << std::endl;
             break;
         }
     }
