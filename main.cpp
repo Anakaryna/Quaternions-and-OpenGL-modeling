@@ -7,13 +7,53 @@
 #include "include/Camera.h"
 #include "include/Map.h"
 #include "include/Quaternion.h"
-
+#include "include/Block.h"
 
 // Objet Camera
 Camera *cam = new Camera();
 // Objet Scène
 Map *m = new Map();
+// Objets Cube
+Block cubeMatrix(1.0f, 1.0f, 1.0f);
+Block cubeQuaternion(1.0f, 1.0f, 1.0f);
+Block cubeGLRotate(1.0f, 1.0f, 1.0f);  // Cube utilisant glRotatef
 
+GLuint textures[8]; // Déclaration des textures
+Quaternion rotationQuaternion(1.0, 0.0, 0.0, 0.0);
+float rotationAngle = 0.0f;
+
+
+void drawCubes()
+{
+    // Cube avec rotation par matrice
+    glPushMatrix();
+    glTranslatef(-4.0f, 0.0f, -5.0f); // Translation pour décentrer
+    glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
+    glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
+    glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
+    cubeMatrix.Draw();
+    glPopMatrix();
+
+    // Cube avec rotation par quaternion
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -5.0f); // Translation pour décentrer
+    glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
+    float matrix[16];
+    rotationQuaternion.to4x4Matrix(matrix);
+    glMultMatrixf(matrix); // Rotation par quaternion
+    glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
+    cubeQuaternion.Draw();
+    glPopMatrix();
+
+    // Cube avec rotation par glRotatef
+    glPushMatrix();
+    glTranslatef(4.0f, 0.0f, -5.0f); // Translation pour décentrer
+    glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
+    glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
+    glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
+    cubeGLRotate.Draw();
+    glPopMatrix();
+}
 
 
 /** GESTION FENETRE **/
@@ -115,7 +155,7 @@ void KeyboardDown(unsigned char key, int xx, int yy)
 
             Quaternion q_from_rotation_matrix = Quaternion::fromRotationMatrix3x3(rotationMatrix);
             std::cout << "Quaternion reconstruit a partir de la matrice de rotation: " << q_from_rotation_matrix << std::endl;
-            
+
             break;
         }
 
@@ -200,34 +240,94 @@ void computePos(int inutile)
     glutTimerFunc(10, computePos, 0);
 }
 
+void updateRotations(int value)
+{
+    rotationAngle += 1.0f;
+    if (rotationAngle >= 360.0f)
+        rotationAngle -= 360.0f;
+
+    Quaternion qIncrement(std::cos(0.5 * 0.0174533), 0.0f, std::sin(0.5 * 0.0174533), 0.0f); // 1 degree around y-axis
+    rotationQuaternion = qIncrement * rotationQuaternion;
+    rotationQuaternion = rotationQuaternion.normalize();
+
+    glutTimerFunc(10, updateRotations, 0);
+}
+
+
+
 /** AFFICHAGE **/
 void renderScene(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    // Définition de la caméra
-    gluLookAt(  cam->posx, cam->posy, cam->posz,
-                cam->posx+cam->dirx, cam->posy+cam->diry,  cam->posz+cam->dirz,
-                0.0f, 1.0f,  0.0f
-    );
+    gluLookAt(cam->posx, cam->posy, cam->posz,
+              cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
+              0.0f, 1.0f, 0.0f);
 
     m->DrawGround();
     m->DrawSkybox(cam);
+
+    // Dessiner les cubes
+    drawCubes();
+
+    // Dessiner la sphère planète
+    cubeMatrix.DrawSphere(textures[SPHERE]);
+
     glutSwapBuffers();
 }
+
+
+
 
 void LoadTextures()
 {
     m->LoadTextures();
+
+    // Charge la texture de la sphère
+    textures[SPHERE] = SOIL_load_OGL_texture(
+            "img/terre.jpg",
+            SOIL_LOAD_AUTO,
+            SOIL_CREATE_NEW_ID,
+            SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+    );
+
+    if (textures[SPHERE] == 0)
+    {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    }
+
+    // Charger les textures pour les cubes
+    textures[0] = SOIL_load_OGL_texture(
+            "img/graybricktiles.bmp",
+            SOIL_LOAD_AUTO,
+            SOIL_CREATE_NEW_ID,
+            SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+    );
+    if (textures[0] == 0)
+    {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    }
+
+    // Assigner la même texture pour chaque face du cube (vous pouvez charger d'autres textures pour chaque face si vous le souhaitez)
+    for (int i = 0; i < 6; i++)
+    {
+        cubeMatrix.SetTexture(i, textures[0]);
+        cubeQuaternion.SetTexture(i, textures[0]);
+        cubeGLRotate.SetTexture(i, textures[0]);
+    }
 }
+
+
+
+
 
 int main(int argc, char **argv)
 {
     /** CREATION FENETRE **/
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowPosition(100,100);
-    glutInitWindowSize(320,320);
+    glutInitWindowPosition(100, 100);
+    glutInitWindowSize(320, 320);
     glutCreateWindow("Quaternions");
 
     /** FONCTIONS GLUT **/
@@ -235,6 +335,7 @@ int main(int argc, char **argv)
     glutReshapeFunc(reshapeWindow);
     glutIdleFunc(renderScene);
     glutTimerFunc(10, computePos, 0);
+    glutTimerFunc(10, updateRotations, 0); // Appel à updateRotations
 
     /** GESTION CLAVIER **/
     glutIgnoreKeyRepeat(1);
@@ -256,9 +357,9 @@ int main(int argc, char **argv)
 
     glutMainLoop();
 
-
-
     return (1);
 }
+
+
 
 

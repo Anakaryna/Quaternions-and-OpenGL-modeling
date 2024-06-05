@@ -20,24 +20,25 @@
 
 class Block
 {
-    public:
-        Block();
-        Block(float x, float y, float z);
-        void Draw();
-        void SetTexture(int face, GLuint texture);
+public:
+    Block();
+    Block(float x, float y, float z);
+    void Draw();
+    void DrawSphere(GLuint texture);  // Nouvelle méthode pour dessiner la sphère
+    void SetTexture(int face, GLuint texture);
 
-        float posx;
-        float posy;
-        float posz;
+    float posx;
+    float posy;
+    float posz;
 
-        float x;
-        float y;
-        float z;
-    protected:
+    float x;
+    float y;
+    float z;
+protected:
 
-    private:
-        GLuint textures[6];
-        char anchor[3];
+private:
+    GLuint textures[6];
+    char anchor[3];
 };
 
 #endif // BLOCK_H
