@@ -23,18 +23,25 @@ Quaternion rotationQuaternion(1.0, 0.0, 0.0, 0.0);
 float rotationAngle = 0.0f;
 
 
+void drawText(const char* text, float x, float y, float z)
+{
+    glRasterPos3f(x, y, z);
+    for (const char* c = text; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+}
+
+
+
 void drawCubes()
 {
     // Cube avec rotation par matrice
-    // Create a 3x3 rotation matrix from the quaternion
     float rotationMatrix[9];
     rotationQuaternion.toRotationMatrix3x3(rotationMatrix);
 
     glPushMatrix();
-    glTranslatef(-4.0f, 0.0f, -5.0f); // Translation pour décentrer
-    glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
-
-    // Apply the 3x3 rotation matrix
+    glTranslatef(-4.0f, 0.0f, -5.0f); // Position du Cube
+    glTranslatef(0.5f, 0.5f, 0.5f); // Translation du centre du cube à l'origine
     float matrix4x4[16] = {
             rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], 0.0f,
             rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], 0.0f,
@@ -42,15 +49,15 @@ void drawCubes()
             0.0f, 0.0f, 0.0f, 1.0f
     };
     glMultMatrixf(matrix4x4);
-
-    glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
+    glTranslatef(-0.5f, -0.5f, -0.5f); // Translation du cube à sa position initiale
     cubeMatrix.Draw();
     glPopMatrix();
+    drawText("Matrix Rotation", -4.0f, 1.5f, -5.0f);
 
     // Cube avec rotation par quaternion
-    // Cube avec rotation par quaternion
     glPushMatrix();
-    glTranslatef(0.0f, 0.0f, -5.0f); // Translation pour décentrer
+    glTranslatef(0.0f, 0.0f, -5.0f); // Position du Cube au centre
+    glTranslatef(0.5f, 0.5f, 0.5f); // Translation du centre du cube à l'origine
 
     float vertices[8][3] = {
             {-0.5f, -0.5f, -0.5f},
@@ -63,44 +70,44 @@ void drawCubes()
             {-0.5f, 0.5f, 0.5f}
     };
 
-    // Apply quaternion rotation to each vertex
+    // Appliquer la rotation quaternion à chaque sommet
     for (int i = 0; i < 8; i++) {
         rotationQuaternion.rotatePointWithQuaternion(vertices[i], rotationQuaternion);
     }
 
     glBegin(GL_QUADS);
 
-    // Front face
+    // Face avant
     glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
     glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[1]);
     glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[2]);
     glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[3]);
 
-    // Back face
+    // Face arrière
     glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[4]);
     glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[5]);
     glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
     glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[7]);
 
-    // Top face
+    // Face supérieure
     glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[3]);
     glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[2]);
     glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
     glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[7]);
 
-    // Bottom face
+    // Face inférieure
     glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
     glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[1]);
     glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[5]);
     glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[4]);
 
-    // Right face
+    // Face droite
     glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[1]);
     glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[5]);
     glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
     glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[2]);
 
-    // Left face
+    // Face gauche
     glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
     glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[4]);
     glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[7]);
@@ -108,25 +115,19 @@ void drawCubes()
 
     glEnd();
     glPopMatrix();
+    drawText("Quaternion Rotation", 0.0f, 1.5f, -5.0f);
 
     // Cube avec rotation par glRotatef
     glPushMatrix();
     glTranslatef(4.0f, 0.0f, -5.0f); // Translation pour décentrer
-    glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
+    glTranslatef(0.5f, 0.5f, 0.5f); // Translation du centre du cube à l'origine
     glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
-    glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
+    glTranslatef(-0.5f, -0.5f, -0.5f); // Translation du cube à sa position initiale
     cubeGLRotate.Draw();
     glPopMatrix();
-
-    // Cube avec rotation par glRotatef
-    glPushMatrix();
-    glTranslatef(4.0f, 0.0f, -5.0f); // Translation pour décentrer
-    glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
-    glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
-    glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
-    cubeGLRotate.Draw();
-    glPopMatrix();
+    drawText("glRotatef Rotation", 4.0f, 1.5f, -5.0f);
 }
+
 
 
 
