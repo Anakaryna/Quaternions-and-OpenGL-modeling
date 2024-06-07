@@ -26,23 +26,96 @@ float rotationAngle = 0.0f;
 void drawCubes()
 {
     // Cube avec rotation par matrice
+    // Create a 3x3 rotation matrix from the quaternion
+    float rotationMatrix[9];
+    rotationQuaternion.toRotationMatrix3x3(rotationMatrix);
+
     glPushMatrix();
     glTranslatef(-4.0f, 0.0f, -5.0f); // Translation pour décentrer
     glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
-    glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
+
+    // Apply the 3x3 rotation matrix
+    float matrix4x4[16] = {
+            rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], 0.0f,
+            rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], 0.0f,
+            rotationMatrix[6], rotationMatrix[7], rotationMatrix[8], 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
+    glMultMatrixf(matrix4x4);
+
     glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
     cubeMatrix.Draw();
     glPopMatrix();
 
     // Cube avec rotation par quaternion
+    // Cube avec rotation par quaternion
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, -5.0f); // Translation pour décentrer
+
+    float vertices[8][3] = {
+            {-0.5f, -0.5f, -0.5f},
+            {0.5f, -0.5f, -0.5f},
+            {0.5f, 0.5f, -0.5f},
+            {-0.5f, 0.5f, -0.5f},
+            {-0.5f, -0.5f, 0.5f},
+            {0.5f, -0.5f, 0.5f},
+            {0.5f, 0.5f, 0.5f},
+            {-0.5f, 0.5f, 0.5f}
+    };
+
+    // Apply quaternion rotation to each vertex
+    for (int i = 0; i < 8; i++) {
+        rotationQuaternion.rotatePointWithQuaternion(vertices[i], rotationQuaternion);
+    }
+
+    glBegin(GL_QUADS);
+
+    // Front face
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[1]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[2]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[3]);
+
+    // Back face
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[4]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[5]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[7]);
+
+    // Top face
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[3]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[2]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[7]);
+
+    // Bottom face
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[1]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[5]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[4]);
+
+    // Right face
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[1]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[5]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[2]);
+
+    // Left face
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[4]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[7]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[3]);
+
+    glEnd();
+    glPopMatrix();
+
+    // Cube avec rotation par glRotatef
+    glPushMatrix();
+    glTranslatef(4.0f, 0.0f, -5.0f); // Translation pour décentrer
     glTranslatef(1.0f, 0.0f, 0.0f); // Mise à l'origine
-    float matrix[16];
-    rotationQuaternion.to4x4Matrix(matrix);
-    glMultMatrixf(matrix); // Rotation par quaternion
+    glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
     glTranslatef(-1.0f, 0.0f, 0.0f); // Repositionnement
-    cubeQuaternion.Draw();
+    cubeGLRotate.Draw();
     glPopMatrix();
 
     // Cube avec rotation par glRotatef
@@ -54,6 +127,8 @@ void drawCubes()
     cubeGLRotate.Draw();
     glPopMatrix();
 }
+
+
 
 
 /** GESTION FENETRE **/

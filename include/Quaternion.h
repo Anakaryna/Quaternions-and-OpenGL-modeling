@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "Block.h"
 
 class Quaternion {
 public:
@@ -52,6 +53,8 @@ public:
 
     // Affichage du quaternion, utile pour le débogage
     friend std::ostream& operator<<(std::ostream& os, const Quaternion& q);
+
+
 };
 
 #endif // QUATERNION_H
