@@ -142,6 +142,87 @@ void drawCubes()
     cubeGLRotate.Draw();
     glPopMatrix();
     drawText("glRotatef Rotation", 5.0f, 1.5f, -5.0f);
+
+
+
+
+    // Shearing et Scaling
+    glPushMatrix();
+    glTranslatef(-12.0f, 1.0f, -5.0f); // Position du Cube
+    applyShear(0.5f, 0.0f, 0.0f); // Applique un cisaillement sur l'axe X
+    glScalef(1.5f, 1.5f, 1.5f); // Appliquer un scaling
+    glMultMatrixf(matrix4x4); // Appliquer la rotation
+    glTranslatef(-2.0f, 0.0f, 0.0f); // Translation du centre du cube décéntré
+    cubeMatrix.Draw();
+    glPopMatrix();
+    drawText("Sclaed and Sheared Rotation", -12.0f, 1.5f, -5.0f);
+
+
+    // Shearing,Translation et Scaling avec Quaternions
+    glPushMatrix();
+    glTranslatef(-18.0f, 1.0f, -5.0f); // Position du Cube
+
+    // Prendre les vertex du cube
+    float shearScaleTranslateVertices[8][3] = {
+            {-0.5f, -0.5f, -0.5f},
+            {0.5f, -0.5f, -0.5f},
+            {0.5f, 0.5f, -0.5f},
+            {-0.5f, 0.5f, -0.5f},
+            {-0.5f, -0.5f, 0.5f},
+            {0.5f, -0.5f, 0.5f},
+            {0.5f, 0.5f, 0.5f},
+            {-0.5f, 0.5f, 0.5f}
+    };
+
+    for (int i = 0; i < 8; i++) {
+        rotationQuaternion.shearAndScalePointandTranslate(shearScaleTranslateVertices[i], 0.5f, 0.0f, 0.0f, 1.5f, 1.5f, 1.5f, 0.0f, 3.0f, 0.0f);
+        rotationQuaternion.rotatePointWithQuaternion(shearScaleTranslateVertices[i], rotationQuaternion);
+
+    }
+
+    glBegin(GL_QUADS);
+
+    // Face avant
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[1]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[2]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[3]);
+
+    // Face arrière
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[4]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[5]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[7]);
+
+    // Face supérieure
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[3]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[2]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[7]);
+
+    // Face inférieure
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[1]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[5]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[4]);
+
+    // Face droite
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[1]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[5]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[2]);
+
+    // Face gauche
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(shearScaleTranslateVertices[4]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[7]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(shearScaleTranslateVertices[3]);
+
+    glEnd();
+
+    glPopMatrix();
+    drawText("Scaled and Sheared Rotation with Quaternion", -18.0f, 3.0f, -5.0f);
+
 }
 
 

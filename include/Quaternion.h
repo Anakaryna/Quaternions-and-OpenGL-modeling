@@ -52,6 +52,13 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Quaternion& q);
 
 
+    // Appliquer du shear,Translation et scaling a un quaternion
+    static void shearAndScalePointandTranslate(float point[3], float shX, float shY, float shZ, float scaleX, float scaleY, float scaleZ, float transX, float transY, float transZ);
+
 };
+
+//Application du Shear
+void applyShear(float shX, float shY, float shZ) ;
+
 
 #endif // QUATERNION_H

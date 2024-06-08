@@ -127,3 +127,37 @@ std::ostream& operator<<(std::ostream& os, const Quaternion& q) {
 
 
 
+void applyShear(float shX, float shY, float shZ)
+{
+    float shearMatrix[16] = {
+            1.0f, shX, shY, 0.0f,
+            shX, 1.0f, shZ, 0.0f,
+            shY, shZ, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
+    glMultMatrixf(shearMatrix);
+}
+
+// Shear et Scale avec Quaternions
+void Quaternion::shearAndScalePointandTranslate(float *point, float shX, float shY, float shZ, float scaleX,
+                                                float scaleY, float scaleZ, float transX, float transY, float transZ) {
+    float x = point[0];
+    float y = point[1];
+    float z = point[2];
+
+    // Appliquer Scale
+    x *= scaleX;
+    y *= scaleY;
+    z *= scaleZ;
+
+    // Appliquer Shearing
+    float newX = x + shX * y + shY * z;
+    float newY = y + shX * x + shZ * z;
+    float newZ = z + shY * x + shZ * y;
+
+    // Applpliquer Translation
+    point[0] = newX + transX;
+    point[1] = newY + transY;
+    point[2] = newZ + transZ;
+}
+
