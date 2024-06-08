@@ -108,7 +108,22 @@ Quaternion Quaternion::fromRotationMatrix3x3(const float matrix[9]) {
     return Quaternion(w, x, y, z);
 }
 
+
+
+void Quaternion::rotatePointWithQuaternion(float point[3], const Quaternion& q) {
+    Quaternion p(0, point[0], point[1], point[2]);
+    Quaternion qConj = q.conjugate();
+    Quaternion result = q * p * qConj;
+    point[0] = result.x;
+    point[1] = result.y;
+    point[2] = result.z;
+}
+
+
 std::ostream& operator<<(std::ostream& os, const Quaternion& q) {
     os << "(" << q.w << " + " << q.x << "i + " << q.y << "j + " << q.z << "k)";
     return os;
 }
+
+
+

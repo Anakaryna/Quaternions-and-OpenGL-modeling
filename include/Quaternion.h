@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "Block.h"
 
 class Quaternion {
 public:
@@ -44,8 +45,13 @@ public:
     // Conversion d'une matrice de rotation 3x3 en quaternion
     static Quaternion fromRotationMatrix3x3(const float matrix[9]);
 
+    // Rotation d'un point par un quaternion
+    static void rotatePointWithQuaternion(float point[3], const Quaternion& q);
+
     // Affichage du quaternion, utile pour le débogage
     friend std::ostream& operator<<(std::ostream& os, const Quaternion& q);
+
+
 };
 
 #endif // QUATERNION_H

@@ -7,12 +7,144 @@
 #include "include/Camera.h"
 #include "include/Map.h"
 #include "include/Quaternion.h"
-
+#include "include/Block.h"
 
 // Objet Camera
 Camera *cam = new Camera();
 // Objet Scène
 Map *m = new Map();
+// Objets Cube
+Block cubeMatrix(1.0f, 1.0f, 1.0f);
+Block cubeQuaternion(1.0f, 1.0f, 1.0f);
+Block cubeGLRotate(1.0f, 1.0f, 1.0f);  // Cube utilisant glRotatef
+
+GLuint textures[8]; // Déclaration des textures
+Quaternion rotationQuaternion(1.0, 0.0, 0.0, 0.0);
+float rotationAngle = 0.0f;
+
+
+void drawText(const char* text, float x, float y, float z)
+{
+    glRasterPos3f(x, y, z);
+    for (const char* c = text; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+}
+
+
+
+void drawCubes()
+{
+    // Cube avec rotation par matrice
+    float rotationMatrix[9];
+    rotationQuaternion.toRotationMatrix3x3(rotationMatrix);
+
+    glPushMatrix();
+    glTranslatef(-4.0f, 0.0f, -5.0f); // Position du Cube
+    //glTranslatef(0.5f, 0.5f, 0.5f); // Translation du centre du cube à l'origine
+    glTranslatef(1.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
+    float matrix4x4[16] = {
+            rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], 0.0f,
+            rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], 0.0f,
+            rotationMatrix[6], rotationMatrix[7], rotationMatrix[8], 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
+    glMultMatrixf(matrix4x4);
+    //glTranslatef(-0.5f, -0.5f, -0.5f); // Translation du cube à sa position initiale
+    glTranslatef(1.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
+    cubeMatrix.Draw();
+    glPopMatrix();
+    drawText("Matrix Rotation", -4.5f, 1.5f, -5.0f);
+
+    // Cube avec rotation par quaternion
+    glPushMatrix();
+    glTranslatef(-1.0f, 0.0f, -5.0f); // Position du Cube au centre
+    glTranslatef(0.5f, 0.5f, 0.5f); // Translation du centre du cube à l'origine
+    //glTranslatef(1.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
+
+    float vertices[8][3] = {
+            {-0.5f, -0.5f, -0.5f},
+            {0.5f, -0.5f, -0.5f},
+            {0.5f, 0.5f, -0.5f},
+            {-0.5f, 0.5f, -0.5f},
+            {-0.5f, -0.5f, 0.5f},
+            {0.5f, -0.5f, 0.5f},
+            {0.5f, 0.5f, 0.5f},
+            {-0.5f, 0.5f, 0.5f}
+    };
+
+    for (int i = 0; i < 8; i++) {
+        vertices[i][0] -= 1.5f; // Translation du centre du cube à l'origine
+    }
+
+    // Appliquer la rotation quaternion à chaque sommet
+    for (int i = 0; i < 8; i++) {
+        rotationQuaternion.rotatePointWithQuaternion(vertices[i], rotationQuaternion);
+    }
+
+    for (int i = 0; i < 8; i++) {
+        vertices[i][0] += 1.5f; // Repositionner les sommets après la rotation
+    }
+
+
+    glBegin(GL_QUADS);
+
+    // Face avant
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[1]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[2]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[3]);
+
+    // Face arrière
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[4]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[5]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[7]);
+
+    // Face supérieure
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[3]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[2]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[7]);
+
+    // Face inférieure
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[1]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[5]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[4]);
+
+    // Face droite
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[1]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[5]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[6]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[2]);
+
+    // Face gauche
+    glTexCoord2f(0.0f, 0.0f); glVertex3fv(vertices[0]);
+    glTexCoord2f(1.0f, 0.0f); glVertex3fv(vertices[4]);
+    glTexCoord2f(1.0f, 1.0f); glVertex3fv(vertices[7]);
+    glTexCoord2f(0.0f, 1.0f); glVertex3fv(vertices[3]);
+
+    glEnd();
+
+    glPopMatrix();
+
+    drawText("Quaternion Rotation", 1.0f, 1.5f, -5.0f);
+
+    // Cube avec rotation par glRotatef
+    glPushMatrix();
+    glTranslatef(4.0f, 0.0f, -5.0f); // Translation pour décentrer
+    //zglTranslatef(-0.5f, -0.5f, -0.5f);
+    glTranslatef(1.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
+    glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
+    //glTranslatef(-0.5f, -0.5f, -0.5f); // Translation du cube à sa position initiale
+    glTranslatef(1.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
+    cubeGLRotate.Draw();
+    glPopMatrix();
+    drawText("glRotatef Rotation", 5.0f, 1.5f, -5.0f);
+}
+
+
 
 
 
@@ -115,7 +247,7 @@ void KeyboardDown(unsigned char key, int xx, int yy)
 
             Quaternion q_from_rotation_matrix = Quaternion::fromRotationMatrix3x3(rotationMatrix);
             std::cout << "Quaternion reconstruit a partir de la matrice de rotation: " << q_from_rotation_matrix << std::endl;
-            
+
             break;
         }
 
@@ -200,34 +332,94 @@ void computePos(int inutile)
     glutTimerFunc(10, computePos, 0);
 }
 
+void updateRotations(int value)
+{
+    rotationAngle += 1.0f;
+    if (rotationAngle >= 360.0f)
+        rotationAngle -= 360.0f;
+
+    Quaternion qIncrement(std::cos(0.5 * 0.0174533), 0.0f, std::sin(0.5 * 0.0174533), 0.0f); // 1 degree around y-axis
+    rotationQuaternion = qIncrement * rotationQuaternion;
+    rotationQuaternion = rotationQuaternion.normalize();
+
+    glutTimerFunc(10, updateRotations, 0);
+}
+
+
+
 /** AFFICHAGE **/
 void renderScene(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    // Définition de la caméra
-    gluLookAt(  cam->posx, cam->posy, cam->posz,
-                cam->posx+cam->dirx, cam->posy+cam->diry,  cam->posz+cam->dirz,
-                0.0f, 1.0f,  0.0f
-    );
+    gluLookAt(cam->posx, cam->posy, cam->posz,
+              cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
+              0.0f, 1.0f, 0.0f);
 
     m->DrawGround();
     m->DrawSkybox(cam);
+
+    // Dessiner les cubes
+    drawCubes();
+
+    // Dessiner la sphère planète
+    cubeMatrix.DrawSphere(textures[SPHERE]);
+
     glutSwapBuffers();
 }
+
+
+
 
 void LoadTextures()
 {
     m->LoadTextures();
+
+    // Charge la texture de la sphère
+    textures[SPHERE] = SOIL_load_OGL_texture(
+            "img/terre.jpg",
+            SOIL_LOAD_AUTO,
+            SOIL_CREATE_NEW_ID,
+            SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+    );
+
+    if (textures[SPHERE] == 0)
+    {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    }
+
+    // Charger les textures pour les cubes
+    textures[0] = SOIL_load_OGL_texture(
+            "img/graybricktiles.bmp",
+            SOIL_LOAD_AUTO,
+            SOIL_CREATE_NEW_ID,
+            SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT
+    );
+    if (textures[0] == 0)
+    {
+        printf("SOIL loading error: '%s'\n", SOIL_last_result());
+    }
+
+    // Assigner la même texture pour chaque face du cube (vous pouvez charger d'autres textures pour chaque face si vous le souhaitez)
+    for (int i = 0; i < 6; i++)
+    {
+        cubeMatrix.SetTexture(i, textures[0]);
+        cubeQuaternion.SetTexture(i, textures[0]);
+        cubeGLRotate.SetTexture(i, textures[0]);
+    }
 }
+
+
+
+
 
 int main(int argc, char **argv)
 {
     /** CREATION FENETRE **/
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowPosition(100,100);
-    glutInitWindowSize(320,320);
+    glutInitWindowPosition(100, 100);
+    glutInitWindowSize(320, 320);
     glutCreateWindow("Quaternions");
 
     /** FONCTIONS GLUT **/
@@ -235,6 +427,7 @@ int main(int argc, char **argv)
     glutReshapeFunc(reshapeWindow);
     glutIdleFunc(renderScene);
     glutTimerFunc(10, computePos, 0);
+    glutTimerFunc(10, updateRotations, 0); // Appel à updateRotations
 
     /** GESTION CLAVIER **/
     glutIgnoreKeyRepeat(1);
@@ -256,9 +449,9 @@ int main(int argc, char **argv)
 
     glutMainLoop();
 
-
-
     return (1);
 }
+
+
 
 
