@@ -55,6 +55,8 @@ void Camera::updatePos()
     }
 }
 
+
+
 void Camera::orienterCam(int x, int y)
 {
     if (xOrigin >= 0)
@@ -97,16 +99,20 @@ void Camera::grabCam(int x, int y)
 }
 
 void Camera::updateOrientation(float targetX, float targetY, float targetZ) {
+    // Calculate direction vector
     dirx = targetX - posx;
     diry = targetY - posy;
     dirz = targetZ - posz;
 
-    // Normalize the direction vector
-    float length = std::sqrt(dirx * dirx + diry * diry + dirz * dirz);
-    if (length != 0.0f) {
+    // Normalize direction vector
+    float length = sqrt(dirx * dirx + diry * diry + dirz * dirz);
+    if (length != 0) {
         dirx /= length;
         diry /= length;
         dirz /= length;
     }
 }
+
+
+
 
