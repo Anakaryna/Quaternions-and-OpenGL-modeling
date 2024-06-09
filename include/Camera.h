@@ -1,6 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "Block.h"
+
 #define MOVE_SPEED 0.1f
 #define SENSIBILITY 0.005f
 
@@ -26,16 +28,17 @@ class Camera
         void releaseCam(void);
         void grabCam(int x, int y);
         void orienterCam(int x, int y);
+        void updateOrientation(float targetX, float targetY, float targetZ);
 
 
-    protected:
+
+    float angleh;
+    float anglev;
+protected:
     private:
 
 
-        float angleh;
-        float anglev;
-
-        int xOrigin;
+    int xOrigin;
         int yOrigin;
         float deltaAnglex;
         float deltaAngley;

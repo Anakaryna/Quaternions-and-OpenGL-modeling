@@ -26,6 +26,9 @@ public:
     void Draw();
     void DrawSphere(GLuint texture);  // Nouvelle méthode pour dessiner la sphère
     void SetTexture(int face, GLuint texture);
+    void GetPosition(float &px, float &py, float &pz) const ;
+    void UpdatePosition() ;
+
 
     float posx;
     float posy;
@@ -34,6 +37,8 @@ public:
     float x;
     float y;
     float z;
+
+
 protected:
 
 private:

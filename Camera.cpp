@@ -1,5 +1,7 @@
 #include "include/Camera.h"
 #include <cmath>
+#include <GL/glu.h>
+#include "include/Block.h"
 
 
 Camera::Camera()
@@ -93,3 +95,18 @@ void Camera::grabCam(int x, int y)
     xOrigin = x;
     yOrigin = y;
 }
+
+void Camera::updateOrientation(float targetX, float targetY, float targetZ) {
+    dirx = targetX - posx;
+    diry = targetY - posy;
+    dirz = targetZ - posz;
+
+    // Normalize the direction vector
+    float length = std::sqrt(dirx * dirx + diry * diry + dirz * dirz);
+    if (length != 0.0f) {
+        dirx /= length;
+        diry /= length;
+        dirz /= length;
+    }
+}
+

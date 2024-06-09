@@ -40,6 +40,31 @@ Block::Block(float x, float y, float z)
     }
 }
 
+void Block::UpdatePosition()
+{
+    float modelview[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+
+    // Local center of the cube
+    float localCenter[4] = {0.5f * x, 0.5f * y, 0.5f * z, 1.0f};
+    float transformedCenter[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+
+    // Transform the local center to world coordinates
+    for (int i = 0; i < 4; i++)
+    {
+        transformedCenter[i] = 0;
+        for (int j = 0; j < 4; j++)
+        {
+            transformedCenter[i] += modelview[j * 4 + i] * localCenter[j];
+        }
+    }
+
+    // Update the position of the cube
+    posx = transformedCenter[0];
+    posy = transformedCenter[1];
+    posz = transformedCenter[2];
+}
+
 void Block::Draw()
 {
     glEnable(GL_TEXTURE_2D);
@@ -187,3 +212,5 @@ void Block::SetTexture(int face, GLuint texture)
 {
     textures[face] = texture;
 }
+
+
