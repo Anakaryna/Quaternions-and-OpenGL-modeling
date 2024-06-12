@@ -21,7 +21,7 @@ Block cubeGLRotate(1.0f, 1.0f, 1.0f);  // Cube utilisant glRotatef
 GLuint textures[8]; // Déclaration des textures
 Quaternion rotationQuaternion(1.0, 0.0, 0.0, 0.0);
 float rotationAngle = 0.0f;
-
+bool swapRender = 1 ;
 
 void drawText(const char* text, float x, float y, float z)
 {
@@ -226,6 +226,71 @@ void drawCubes()
 }
 
 
+// Function to create a rotation matrix around the Y-axis
+
+void createOrbitMatrix(float angle, float matrix[16])
+{
+    float cosAngle = cos(angle);
+    float sinAngle = sin(angle);
+
+    matrix[0] = cosAngle; matrix[1] = 0.0f; matrix[2] = sinAngle; matrix[3] = 0.0f;
+    matrix[4] = 0.0f;     matrix[5] = 1.0f; matrix[6] = 0.0f;     matrix[7] = 0.0f;
+    matrix[8] = -sinAngle; matrix[9] = 0.0f; matrix[10] = cosAngle; matrix[11] = 0.0f;
+    matrix[12] = 0.0f;     matrix[13] = 0.0f; matrix[14] = 0.0f;     matrix[15] = 1.0f;
+}
+
+
+void drawSolarSys() {
+    float time = 150.0f;
+
+    // Cube avec rotation par matrice
+    float rotationMatrix[9];
+    rotationQuaternion.toRotationMatrix3x3(rotationMatrix);
+
+    float matrix4x4[16] = {
+            rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], 0.0f,
+            rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], 0.0f,
+            rotationMatrix[6], rotationMatrix[7], rotationMatrix[8], 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    // Define positions and speeds for each sphere
+    float posX = 0.0f; // Example X position
+    float posY = 0.0f; // Example Y position
+    float posZ = 0.0f; // Example Z position
+    float speed1 = 1.0f; // Speed for first sphere
+    float angle1 = time * speed1;
+    float orbitMatrix1[16];
+    createOrbitMatrix(angle1, orbitMatrix1);
+    cubeMatrix.DrawSphere2(textures[SPHERE], posX, posY, posZ, matrix4x4, orbitMatrix1, 5.0f, 10.0f);
+
+    float posX1 = 7.0f; // Example X position
+    float posY1 = 0.0f; // Example Y position
+    float posZ1 = 0.0f; // Example Z position
+    float speed2 = 20.0f; // Speed for second sphere
+    float angle2 = time * speed2;
+    float orbitMatrix2[16];
+    createOrbitMatrix(angle2, orbitMatrix2);
+    cubeMatrix.DrawSphere2(textures[SPHERE], posX1, posY1, posZ1, matrix4x4, orbitMatrix2, 1.0f, 10.0f);
+
+    float posX2 = 15.0f; // Example X position
+    float posY2 = 0.0f; // Example Y position
+    float posZ2 = 0.0f; // Example Z position
+    float speed3 = 1.5f; // Speed for third sphere
+    float angle3 = time * speed3;
+    float orbitMatrix3[16];
+    createOrbitMatrix(angle3, orbitMatrix3);
+    cubeMatrix.DrawSphere2(textures[SPHERE], posX2, posY2, posZ2, matrix4x4, orbitMatrix3, 7.0f, 10.0f);
+
+    float posX3 = 30.0f; // Example X position
+    float posY3 = 0.0f; // Example Y position
+    float posZ3 = 0.0f; // Example Z position
+    float speed4 = 0.5f; // Speed for fourth sphere
+    float angle4 = time * speed4;
+    float orbitMatrix4[16];
+    createOrbitMatrix(angle4, orbitMatrix4);
+    cubeMatrix.DrawSphere2(textures[SPHERE], posX3, posY3, posZ3, matrix4x4, orbitMatrix4, 3.0f, 10.0f);
+}
 
 
 
@@ -250,6 +315,9 @@ void KeyboardDown(unsigned char key, int xx, int yy)
 {
     switch(key)
     {
+        case 'm' :
+            swapRender = !swapRender ;
+            break ;
         case 'e': // Unlock Camera
             cam->locked = (cam->locked)?0:1;
             break;
@@ -440,11 +508,16 @@ void renderScene(void)
     m->DrawGround();
     m->DrawSkybox(cam);
 
-    // Dessiner les cubes
-    drawCubes();
-
+    if(swapRender ==1) {
+        // Dessiner les cubes
+        drawCubes();
+        cubeMatrix.DrawSphere(textures[SPHERE],10);
+    }
+    else {
+        drawSolarSys() ;
+    }
     // Dessiner la sphère planète
-    cubeMatrix.DrawSphere(textures[SPHERE]);
+
 
     glutSwapBuffers();
 }

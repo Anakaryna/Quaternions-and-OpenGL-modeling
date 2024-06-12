@@ -161,7 +161,7 @@ void Block::Draw()
     glPopMatrix();
 }
 
-void Block::DrawSphere(GLuint texture)
+void Block::DrawSphere(GLuint texture, float radius)
 {
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -177,7 +177,7 @@ void Block::DrawSphere(GLuint texture)
     // Ajoutez une rotation initiale ici
     glRotatef(-90, 1.0f, 0.0f, 0.0f); // Ajustez l'angle et l'axe selon vos besoins
 
-    gluSphere(params, 5, 100, 100); // Dessiner la sphère
+    gluSphere(params, radius, 100, 100); // Dessiner la sphère
     glPopMatrix();
     gluDeleteQuadric(params);
 }
@@ -187,3 +187,40 @@ void Block::SetTexture(int face, GLuint texture)
 {
     textures[face] = texture;
 }
+
+
+void Block::DrawSphere2(GLuint texture, float posX, float posY, float posZ, float matrix4x4[16], float orbit_matrix4x4[16], float radius, float orbitRadius)
+{
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    GLUquadric* params = gluNewQuadric();
+    gluQuadricTexture(params, GL_TRUE);
+
+    glPushMatrix();
+
+    // Apply the initial rotation matrix
+    glMultMatrixf(matrix4x4);
+
+    // Translate to the orbit center position
+    glTranslatef(posX, posY, posZ);
+
+    // Apply the orbit rotation matrix
+    glMultMatrixf(orbit_matrix4x4);
+
+    // Translate by the orbit radius to position the sphere in orbit
+    glTranslatef(orbitRadius, 0.0f, 0.0f);
+
+    // Draw the sphere
+    gluSphere(params, radius, 100, 100);
+
+    glPopMatrix();
+
+    gluDeleteQuadric(params);
+}
+
+
+

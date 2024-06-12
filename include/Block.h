@@ -24,12 +24,13 @@ public:
     Block();
     Block(float x, float y, float z);
     void Draw();
-    void DrawSphere(GLuint texture);  // Nouvelle méthode pour dessiner la sphère
+    void DrawSphere(GLuint texture,float radius);  // Nouvelle méthode pour dessiner la sphère
     void SetTexture(int face, GLuint texture);
-
+    void DrawSphere2(GLuint texture, float posX, float posY, float posZ, float matrix4x4[16], float orbit_matrix4x4[16], float radius, float orbitRadius) ;
     float posx;
     float posy;
     float posz;
+
 
     float x;
     float y;
