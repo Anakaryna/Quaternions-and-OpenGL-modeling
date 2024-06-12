@@ -1,4 +1,5 @@
 #include "include/Block.h"
+#include <cmath>
 
 Block::Block()
 {
@@ -40,8 +41,7 @@ Block::Block(float x, float y, float z)
     }
 }
 
-void Block::UpdatePosition()
-{
+void Block::UpdatePosition() {
     float modelview[16];
     glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
 
@@ -50,23 +50,22 @@ void Block::UpdatePosition()
     float transformedCenter[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
     // Transform the local center to world coordinates
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         transformedCenter[i] = 0;
-        for (int j = 0; j < 4; j++)
-        {
+        for (int j = 0; j < 4; j++) {
             transformedCenter[i] += modelview[j * 4 + i] * localCenter[j];
         }
     }
 
-    // Update the position of the cube
     posx = transformedCenter[0];
     posy = transformedCenter[1];
     posz = transformedCenter[2];
 }
 
+
 void Block::Draw()
 {
+
     glEnable(GL_TEXTURE_2D);
     glColor3f(1.0f, 1.0f, 1.0f);
     glPushMatrix();
@@ -184,6 +183,7 @@ void Block::Draw()
     glEnd();
 
     glPopMatrix();
+
 }
 
 void Block::DrawSphere(GLuint texture)

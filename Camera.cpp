@@ -2,6 +2,16 @@
 #include <cmath>
 #include <GL/glu.h>
 #include "include/Block.h"
+#include <GL/glut.h>
+#include <SOIL/SOIL.h>
+#include <cstdio>
+#include <cmath>
+#include <iomanip>
+
+#include "include/Camera.h"
+#include "include/Map.h"
+#include "include/Quaternion.h"
+#include "include/Block.h"
 
 
 Camera::Camera()
@@ -28,7 +38,7 @@ Camera::Camera()
 
 
 
-    locked = 1;
+    locked = 0 ;
 }
 
 void Camera::updatePos()
@@ -37,11 +47,13 @@ void Camera::updatePos()
     {
         if (locked)
         {
+            /*
             posx += deltaForward * (dirx/cos(anglev + deltaAngley)) * MOVE_SPEED;
             posy = 1.5f;
             posz += deltaForward * (dirz/cos(anglev + deltaAngley)) * MOVE_SPEED;
             posx += deltaStrafe * (dirz/cos(anglev + deltaAngley)) * MOVE_SPEED;
             posz -= deltaStrafe * (dirx/cos(anglev + deltaAngley)) * MOVE_SPEED;
+             */
 
         }
         else
@@ -78,7 +90,7 @@ void Camera::orienterCam(int x, int y)
         if (deltaAngley + anglev < -M_PI_2)
             deltaAngley = -M_PI_2 - anglev + 0.01f;
 
-        // Mis à jour de la caméra
+        // Mis ? jour de la cam?ra
         dirx = sin(angleh + deltaAnglex)*cos(anglev + deltaAngley);
         diry = -sin(anglev + deltaAngley);
         dirz = -cos(angleh + deltaAnglex)*cos(anglev + deltaAngley);
@@ -103,15 +115,27 @@ void Camera::updateOrientation(float targetX, float targetY, float targetZ) {
     dirx = targetX - posx;
     diry = targetY - posy;
     dirz = targetZ - posz;
-
+    std::cout << "Camera Position In update : (" << posx << ", " << posy << ", " << posz << ")\n";
     // Normalize direction vector
+
     float length = sqrt(dirx * dirx + diry * diry + dirz * dirz);
     if (length != 0) {
         dirx /= length;
         diry /= length;
         dirz /= length;
+
+        // Default up vector (0, 1, 0)
+        float upx = 0.0f;
+        float upy = 1.0f;
+        float upz = 0.0f;
+
+
+
     }
+
 }
+
+
 
 
 

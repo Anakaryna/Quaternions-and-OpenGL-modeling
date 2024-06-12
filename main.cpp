@@ -15,8 +15,10 @@ Camera *cam = new Camera();
 Map *m = new Map();
 // Objets Cube
 Block cubeMatrix(1.0f, 1.0f, 1.0f);
+
 Block cubeQuaternion(1.0f, 1.0f, 1.0f);
 Block cubeGLRotate(1.0f, 1.0f, 1.0f);  // Cube utilisant glRotatef
+Block cubeMatrix2(1.0f, 1.0f, 1.0f);
 
 GLuint textures[8]; // Déclaration des textures
 Quaternion rotationQuaternion(1.0, 0.0, 0.0, 0.0);
@@ -35,6 +37,8 @@ void drawText(const char* text, float x, float y, float z)
 
 void drawCubes()
 {
+
+
     // Cube avec rotation par matrice
     float rotationMatrix[9];
     rotationQuaternion.toRotationMatrix3x3(rotationMatrix);
@@ -53,18 +57,20 @@ void drawCubes()
 
 
     //glTranslatef(-0.5f, -0.5f, -0.5f); // Translation du cube à sa position initiale
-    glTranslatef(20.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
+    glTranslatef(5.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
 
     cubeMatrix.UpdatePosition();
 
-    printf("cubeMatrix position: (%f, %f, %f)\n", cubeMatrix.posx, cubeMatrix.posy, cubeMatrix.posz);
+    printf("cubeMatrix position in Drawubes: (%f, %f, %f)\n", cubeMatrix.posx, cubeMatrix.posy, cubeMatrix.posz);
 
     cubeMatrix.Draw();
 
 
 
+
     glPopMatrix();
     drawText("Matrix Rotation", -4.5f, 1.5f, -5.0f);
+
 
 
 
@@ -144,6 +150,8 @@ void drawCubes()
 
     drawText("Quaternion Rotation", 1.0f, 1.5f, -5.0f);
 
+
+
     // Cube avec rotation par glRotatef
     glPushMatrix();
     glTranslatef(4.0f, 0.0f, -5.0f); // Translation pour décentrer
@@ -161,12 +169,18 @@ void drawCubes()
 
     // Shearing et Scaling
     glPushMatrix();
+    float matrix4x4_2[16] = {
+            rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], 0.0f,
+            rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], 0.0f,
+            rotationMatrix[6], rotationMatrix[7], rotationMatrix[8], 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
+    };
     glTranslatef(-12.0f, 1.0f, -5.0f); // Position du Cube
     applyShear(0.5f, 0.0f, 0.0f); // Applique un cisaillement sur l'axe X
     glScalef(1.5f, 1.5f, 1.5f); // Appliquer un scaling
-    glMultMatrixf(matrix4x4); // Appliquer la rotation
+    glMultMatrixf(matrix4x4_2); // Appliquer la rotation
     glTranslatef(-2.0f, 0.0f, 0.0f); // Translation du centre du cube décéntré
-    cubeMatrix.Draw();
+    cubeMatrix2.Draw();
     glPopMatrix();
     drawText("Sclaed and Sheared Rotation", -12.0f, 1.5f, -5.0f);
 
@@ -437,59 +451,8 @@ void updateRotations(int value)
     rotationQuaternion = rotationQuaternion.normalize();
 
     glutTimerFunc(10, updateRotations, 0);
+
 }
-
-
-
-/** AFFICHAGE **/
-/*
-void renderScene(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    gluLookAt(cam->posx, cam->posy, cam->posz,
-              cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
-              0.0f, 1.0f, 0.0f);
-
-    m->DrawGround();
-    m->DrawSkybox(cam);
-
-    // Dessiner les cubes
-    drawCubes();
-
-    // Dessiner la sphère planète
-    cubeMatrix.DrawSphere(textures[SPHERE]);
-
-    glutSwapBuffers();
-}
- */
-/** AFFICHAGE **/
-void renderScene(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-
-    // Update the camera to look at the object's position
-    cam->updateOrientation(cubeMatrix.posx, cubeMatrix.posy, cubeMatrix.posz);
-
-    gluLookAt(cam->posx, cam->posy, cam->posz,
-              cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
-              0.0f, 1.0f, 0.0f);
-
-    m->DrawGround();
-    m->DrawSkybox(cam);
-
-    // Dessiner les cubes
-    drawCubes();
-
-    // Dessiner la sphère planète
-    cubeMatrix.DrawSphere(textures[SPHERE]);
-
-    glutSwapBuffers();
-}
-
-
-
 
 
 void LoadTextures()
@@ -527,15 +490,89 @@ void LoadTextures()
         cubeMatrix.SetTexture(i, textures[0]);
         cubeQuaternion.SetTexture(i, textures[0]);
         cubeGLRotate.SetTexture(i, textures[0]);
+        cubeMatrix2.SetTexture(i,textures[0]);
     }
+}
+
+
+
+/** AFFICHAGE **/
+/*
+void renderScene(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+    gluLookAt(cam->posx, cam->posy, cam->posz,
+              cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
+              0.0f, 1.0f, 0.0f);
+
+    m->DrawGround();
+    m->DrawSkybox(cam);
+
+    // Dessiner les cubes
+    drawCubes();
+
+    // Dessiner la sphère planète
+    cubeMatrix.DrawSphere(textures[SPHERE]);
+
+    glutSwapBuffers();
+}
+*/
+
+
+void renderScene(void) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+
+    // Update the camera to look at the cubeMatrix's position
+    if (cam->locked) {
+
+        // Set the camera to look at the cubeMatrix's position
+        printf("cubeMatrix position in Drawubes2: (%f, %f, %f)\n", cubeMatrix.posx, cubeMatrix.posy, cubeMatrix.posz);
+        cam->updateOrientation( cubeMatrix.posx,  cubeMatrix.posy,   cubeMatrix.posz);
+        printf("cubeMatrix position in 32: (%f, %f, %f)\n", cubeMatrix.posx, cubeMatrix.posy, cubeMatrix.posz);
+
+        gluLookAt(cam->posx, cam->posy, cam->posz,
+                  cam->posx + cubeMatrix.posx, cam->posy + cubeMatrix.posy, cam->posz +  cubeMatrix.posz,
+                  0.0f, 1.0f, 0.0f);
+
+
+        printf("cubeMatrix position in Drawubes4: (%f, %f, %f)\n", cubeMatrix.posx, cubeMatrix.posy, cubeMatrix.posz);
+        // Debug output for camera position and direction
+        std::cout << "Camera Position: (" << cam->posx << ", " << cam->posy << ", " << cam->posz << ")\n";
+        std::cout << "Camera Direction: (" << cam->dirx << ", " << cam->diry << ", " << cam->dirz << ")\n";
+        std::cout << "cubeMatrix Position: (" << cubeMatrix.posx << ", " << cubeMatrix.posy << ", " << cubeMatrix.posz << ")\n";
+
+
+
+    } else {
+        gluLookAt(cam->posx, cam->posy, cam->posz,
+                  cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
+                  0.0f, 1.0f, 0.0f);
+    }
+
+    m->DrawGround();
+    m->DrawSkybox(cam);
+
+    // Draw the cubes
+    drawCubes();
+
+
+    // Draw the sphere planet
+    cubeMatrix.DrawSphere(textures[SPHERE]);
+
+    glutSwapBuffers();
 }
 
 
 
 
 
-int main(int argc, char **argv)
-{
+
+
+
+int main(int argc, char **argv) {
     /** CREATION FENETRE **/
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
@@ -543,13 +580,13 @@ int main(int argc, char **argv)
     glutInitWindowSize(320, 320);
     glutCreateWindow("Quaternions");
 
-
     /** FONCTIONS GLUT **/
     glutDisplayFunc(renderScene);
     glutReshapeFunc(reshapeWindow);
     glutIdleFunc(renderScene);
     glutTimerFunc(10, computePos, 0);
     glutTimerFunc(10, updateRotations, 0); // Appel à updateRotations
+
 
     /** GESTION CLAVIER **/
     glutIgnoreKeyRepeat(1);
@@ -573,7 +610,6 @@ int main(int argc, char **argv)
 
     return (1);
 }
-
 
 
 
