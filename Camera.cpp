@@ -72,7 +72,7 @@ void Camera::orienterCam(int x, int y)
         orientation = orientation.normalize();
 
         // Update the direction vector using the quaternion
-        Quaternion forward(0.0f, 0.0f, 0.0f, -1.0f); // Forward vector as a quaternion
+        Quaternion forward(0.0f, 0.0f, 0.0f, -1.0f);
         Quaternion rotatedForward = orientation * forward * orientation.conjugate();
 
         // Update the direction vector

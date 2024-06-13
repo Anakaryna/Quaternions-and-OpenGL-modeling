@@ -174,8 +174,7 @@ void Block::DrawSphere(GLuint texture, float radius)
     glPushMatrix();
     glTranslatef(10, 10, 10); // Positionner la sphère
 
-    // Ajoutez une rotation initiale ici
-    glRotatef(-90, 1.0f, 0.0f, 0.0f); // Ajustez l'angle et l'axe selon vos besoins
+    glRotatef(-90, 1.0f, 0.0f, 0.0f);
 
     gluSphere(params, radius, 100, 100); // Dessiner la sphère
     glPopMatrix();
@@ -189,22 +188,7 @@ void Block::SetTexture(int face, GLuint texture)
 }
 
 
-/*
-void Block::rotateSphere(GLUquadric* params, float radius, const Quaternion& rotation) {
-    glPushMatrix();
-    float rotationMatrix[9];
-    rotation.toRotationMatrix3x3(rotationMatrix);
-    float matrix4x4[16] = {
-            rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], 0.0f,
-            rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], 0.0f,
-            rotationMatrix[6], rotationMatrix[7], rotationMatrix[8], 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-    };
-    glMultMatrixf(matrix4x4); // Apply the rotation matrix
-    gluSphere(params, radius, 100, 100);
-    glPopMatrix();
-}
- */
+
 
 void Block::rotateSphere(GLUquadric* params, float radius, const Quaternion& rotation) {
     const int slices = 100;
@@ -241,44 +225,7 @@ void Block::rotateSphere(GLUquadric* params, float radius, const Quaternion& rot
 
 
 
-/*
-void Block::DrawSphere2(GLuint texture, float posX, float posY, float posZ, const Quaternion& rotation, const Quaternion& orbitRotation, float radius, float orbitRadius) {
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    GLUquadric* params = gluNewQuadric();
-    gluQuadricTexture(params, GL_TRUE);
-
-    glPushMatrix();
-
-    // Translate to the orbit center position
-    glTranslatef(posX, posY, posZ);
-
-    // Apply orbit rotation
-    float orbitCenter[3] = {orbitRadius, 0.0f, 0.0f};
-    orbitRotation.rotatePoint(orbitCenter);
-
-    // Translate by the rotated orbit radius to position the sphere in orbit
-    glTranslatef(orbitCenter[0], orbitCenter[1], orbitCenter[2]);
-
-    // Apply the initial rotation to the sphere
-    float sphereCenter[3] = {0.0f, 0.0f, 0.0f};
-    rotation.rotatePoint(sphereCenter);
-
-    glTranslatef(sphereCenter[0], sphereCenter[1], sphereCenter[2]);
-    // Rotate the sphere
-    rotateSphere(params, radius, rotation);
-    // Draw the sphere
-    gluSphere(params, radius, 100, 100);
-
-    glPopMatrix();
-
-    gluDeleteQuadric(params);
-}
-*/
 void Block::DrawSphere2(GLuint texture, float posX, float posY, float posZ, const Quaternion& rotation, const Quaternion& orbitRotation, float radius, float orbitRadius) {
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -307,6 +254,8 @@ void Block::DrawSphere2(GLuint texture, float posX, float posY, float posZ, cons
     glPopMatrix();
 
     gluDeleteQuadric(params);
+
+
 }
 
 

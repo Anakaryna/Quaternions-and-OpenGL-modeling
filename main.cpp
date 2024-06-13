@@ -45,7 +45,6 @@ void drawCubes()
     glPushMatrix();
     glTranslatef(-4.0f, 0.0f, -5.0f); // Position du Cube
     //glTranslatef(0.5f, 0.5f, 0.5f); // Translation du centre du cube à l'origine
-    glTranslatef(1.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
     float matrix4x4[16] = {
             rotationMatrix[0], rotationMatrix[1], rotationMatrix[2], 0.0f,
             rotationMatrix[3], rotationMatrix[4], rotationMatrix[5], 0.0f,
@@ -137,7 +136,7 @@ void drawCubes()
     // Cube avec rotation par glRotatef
     glPushMatrix();
     glTranslatef(4.0f, 0.0f, -5.0f); // Translation pour décentrer
-    //zglTranslatef(-0.5f, -0.5f, -0.5f);
+    //glTranslatef(-0.5f, -0.5f, -0.5f);
     glTranslatef(1.0f, 0.0f, 0.0f); // Translation du centre du cube decentré
     glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotation
     //glTranslatef(-0.5f, -0.5f, -0.5f); // Translation du cube à sa position initiale
@@ -230,56 +229,8 @@ void drawCubes()
 
 
 
-
-/*
 void drawSolarSys() {
-    float time = glutGet(GLUT_ELAPSED_TIME) ; // Get the elapsed time in seconds
-
-    // Define positions and speeds for each sphere
-    float posX = 0.0f; // Example X position
-    float posY = 0.0f; // Example Y position
-    float posZ = 0.0f; // Example Z position
-    float speed1 = 0.001f; // Speed for first sphere
-    float angle1 = time * speed1;
-    Quaternion orbitRotation1(cos(angle1 / 2), 0.0f, sin(angle1 / 2), 0.0f);
-
-    float posX1 = 7.0f; // Example X position
-    float posY1 = 0.0f; // Example Y position
-    float posZ1 = 0.0f; // Example Z position
-    float speed2 = 0.005f; // Speed for second sphere
-    float angle2 = time * speed2;
-    Quaternion orbitRotation2(cos(angle2 / 2), 0.0f, sin(angle2 / 2), 0.0f);
-
-    float posX2 = 15.0f; // Example X position
-    float posY2 = 0.0f; // Example Y position
-    float posZ2 = 0.0f; // Example Z position
-    float speed3 = 0.009f; // Speed for third sphere
-    float angle3 = time * speed3;
-    Quaternion orbitRotation3(cos(angle3 / 2), 0.0f, sin(angle3 / 2), 0.0f);
-
-    float posX3 = 30.0f; // Example X position
-    float posY3 = 0.0f; // Example Y position
-    float posZ3 = 0.0f; // Example Z position
-    float speed4 = 0.01f; // Speed for fourth sphere
-    float angle4 = time * speed4;
-    Quaternion orbitRotation4(cos(angle4 / 2), 0.0f, sin(angle4 / 2), 0.0f);
-
-    // Rotation quaternion for the spheres (rotation around the Y-axis)
-    float angle = time * 100.0f; // Example rotation speed
-    Quaternion rotation(cos(angle / 2), 0.0f, sin(angle / 2), 0.0f);
-
-    // Draw the spheres with the updated positions and rotations
-    cubeMatrix.DrawSphere2(textures[SPHERE], posX, posY, posZ, rotation, orbitRotation1, 5.0f, 10.0f);
-    cubeMatrix.DrawSphere2(textures[SPHERE], posX1, posY1, posZ1, rotation, orbitRotation2, 1.0f, 10.0f);
-    cubeMatrix.DrawSphere2(textures[SPHERE], posX2, posY2, posZ2, rotation, orbitRotation3, 7.0f, 10.0f);
-    cubeMatrix.DrawSphere2(textures[SPHERE], posX3, posY3, posZ3, rotation, orbitRotation4, 3.0f, 10.0f);
-}
-*/
-
-
-/*
-void drawSolarSys() {
-    float time = glutGet(GLUT_ELAPSED_TIME) / 10.0f; // Get the elapsed time in seconds
+    float time = glutGet(GLUT_ELAPSED_TIME) / 10.0f;
 
     // Define speeds and sizes for each planet
     float speedMercury = 0.004f;
@@ -336,7 +287,7 @@ void drawSolarSys() {
     float orbitRadiusUranus = 90.0f;
     float orbitRadiusNeptune = 110.0f;
 
-    // Sizes of the planets (not to scale)
+    // Sizes of the planets
     float radiusMercury = 0.3f;
     float radiusVenus = 0.9f;
     float radiusEarth = 1.0f;
@@ -348,96 +299,7 @@ void drawSolarSys() {
     float radiusSun = 3.0f;
 
     // Rotation quaternion for the planets (rotation around the Y-axis)
-    float angle = time * 10.0f; // Example rotation speed
-    Quaternion rotation(cos(angle / 2), 0.0f, sin(angle / 2), 0.0f);
-
-    // Draw the Sun
-    cubeMatrix.DrawSphere2(textures[SUN], centerX, centerY, centerZ, rotation, Quaternion(1, 0, 0, 0), radiusSun, 0.0f);
-
-    // Draw the planets with the updated positions and rotations
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationMercury, radiusMercury, orbitRadiusMercury);
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationVenus, radiusVenus, orbitRadiusVenus);
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationEarth, radiusEarth, orbitRadiusEarth);
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationMars, radiusMars, orbitRadiusMars);
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationJupiter, radiusJupiter, orbitRadiusJupiter);
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationSaturn, radiusSaturn, orbitRadiusSaturn);
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationUranus, radiusUranus, orbitRadiusUranus);
-    cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationNeptune, radiusNeptune, orbitRadiusNeptune);
-}
-
-*/
-
-void drawSolarSys() {
-    float time = glutGet(GLUT_ELAPSED_TIME) / 10.0f; // Get the elapsed time in seconds
-
-    // Define speeds and sizes for each planet
-    float speedMercury = 0.004f;
-    float speedVenus = 0.0015f;
-    float speedEarth = 0.001f;
-    float speedMars = 0.0008f;
-    float speedJupiter = 0.0002f;
-    float speedSaturn = 0.0001f;
-    float speedUranus = 0.00005f;
-    float speedNeptune = 0.00003f;
-
-    // Initial angles for each planet
-    float initialAngleMercury = 0.0f;
-    float initialAngleVenus = 45.0f;  // 45 degrees in radians
-    float initialAngleEarth = 90.0f;  // 90 degrees in radians
-    float initialAngleMars = 135.0f;  // 135 degrees in radians
-    float initialAngleJupiter = 180.0f;  // 180 degrees in radians
-    float initialAngleSaturn = 225.0f;  // 225 degrees in radians
-    float initialAngleUranus = 270.0f;  // 270 degrees in radians
-    float initialAngleNeptune = 315.0f;  // 315 degrees in radians
-
-    // Angles based on the elapsed time and initial angles
-    float angleMercury = time * speedMercury + initialAngleMercury;
-    float angleVenus = time * speedVenus + initialAngleVenus;
-    float angleEarth = time * speedEarth + initialAngleEarth;
-    float angleMars = time * speedMars + initialAngleMars;
-    float angleJupiter = time * speedJupiter + initialAngleJupiter;
-    float angleSaturn = time * speedSaturn + initialAngleSaturn;
-    float angleUranus = time * speedUranus + initialAngleUranus;
-    float angleNeptune = time * speedNeptune + initialAngleNeptune;
-
-    // Orbit rotations
-    Quaternion orbitRotationMercury(cos(angleMercury / 2), 0.0f, sin(angleMercury / 2), 0.0f);
-    Quaternion orbitRotationVenus(cos(angleVenus / 2), 0.0f, sin(angleVenus / 2), 0.0f);
-    Quaternion orbitRotationEarth(cos(angleEarth / 2), 0.0f, sin(angleEarth / 2), 0.0f);
-    Quaternion orbitRotationMars(cos(angleMars / 2), 0.0f, sin(angleMars / 2), 0.0f);
-    Quaternion orbitRotationJupiter(cos(angleJupiter / 2), 0.0f, sin(angleJupiter / 2), 0.0f);
-    Quaternion orbitRotationSaturn(cos(angleSaturn / 2), 0.0f, sin(angleSaturn / 2), 0.0f);
-    Quaternion orbitRotationUranus(cos(angleUranus / 2), 0.0f, sin(angleUranus / 2), 0.0f);
-    Quaternion orbitRotationNeptune(cos(angleNeptune / 2), 0.0f, sin(angleNeptune / 2), 0.0f);
-
-    // Center position for all spheres (the Sun)
-    float centerX = 0.0f;
-    float centerY = 0.0f;
-    float centerZ = 0.0f;
-
-    // Distances of the planets from the center (not to scale)
-    float orbitRadiusMercury = 10.0f;
-    float orbitRadiusVenus = 15.0f;
-    float orbitRadiusEarth = 20.0f;
-    float orbitRadiusMars = 30.0f;
-    float orbitRadiusJupiter = 50.0f;
-    float orbitRadiusSaturn = 70.0f;
-    float orbitRadiusUranus = 90.0f;
-    float orbitRadiusNeptune = 110.0f;
-
-    // Sizes of the planets (not to scale)
-    float radiusMercury = 0.3f;
-    float radiusVenus = 0.9f;
-    float radiusEarth = 1.0f;
-    float radiusMars = 0.5f;
-    float radiusJupiter = 2.5f;
-    float radiusSaturn = 2.0f;
-    float radiusUranus = 1.5f;
-    float radiusNeptune = 1.4f;
-    float radiusSun = 3.0f;
-
-    // Rotation quaternion for the planets (rotation around the Y-axis)
-    float rotationSpeed = 0.00001f; // Adjust this value to control rotation speed around its own axis
+    float rotationSpeed = 0.00001f;
     float angleRotation = time * rotationSpeed;
     Quaternion rotationIncrement(cos(angleRotation / 2), 0.0f, sin(angleRotation / 2), 0.0f);
 
@@ -490,12 +352,6 @@ void drawSolarSys() {
     rotationNeptune = rotationNeptune.normalize();
     cubeMatrix.DrawSphere2(textures[NEPTUNE], centerX, centerY, centerZ, rotationNeptune, orbitRotationNeptune, radiusNeptune, orbitRadiusNeptune);
 }
-
-
-
-
-
-
 
 
 
@@ -705,33 +561,7 @@ void updateRotations(int value)
 
 
 
-/** AFFICHAGE **/
-/*
-void renderScene(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    gluLookAt(cam->posx, cam->posy, cam->posz,
-              cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
-              0.0f, 1.0f, 0.0f);
 
-    m->DrawGround();
-    m->DrawSkybox(cam);
-
-    if(swapRender ==1) {
-        // Dessiner les cubes
-        drawCubes();
-        cubeMatrix.DrawSphere(textures[SPHERE],10);
-    }
-    else {
-        drawSolarSys() ;
-    }
-    // Dessiner la sphère planète
-
-
-    glutSwapBuffers();
-}
-*/
 /** AFFICHAGE **/
 void renderScene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
