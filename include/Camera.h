@@ -2,7 +2,8 @@
 #define CAMERA_H
 
 #define MOVE_SPEED 0.1f
-#define SENSIBILITY 0.005f
+#define SENSIBILITY 0.000005f
+#include "Quaternion.h"
 
 class Camera
 {
@@ -31,7 +32,7 @@ class Camera
     protected:
     private:
 
-
+        Quaternion orientation;
         float angleh;
         float anglev;
 
