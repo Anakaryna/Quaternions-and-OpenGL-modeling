@@ -1,8 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#define MOVE_SPEED 0.1f
-#define SENSIBILITY 0.000005f
+#define MOVE_SPEED 0.2f
+#define SENSIBILITY 0.00005f
 #include "Quaternion.h"
 
 class Camera
