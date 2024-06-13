@@ -751,6 +751,7 @@ void renderScene(void) {
 
     } else {
         drawSolarSys();
+        m->DrawSolarSystemSkybox(cam);
     }
 
     glutSwapBuffers();
