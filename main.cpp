@@ -20,6 +20,7 @@ Block cubeGLRotate(1.0f, 1.0f, 1.0f);  // Cube utilisant glRotatef
 
 GLuint textures[8]; // Déclaration des textures
 Quaternion rotationQuaternion(1.0, 0.0, 0.0, 0.0);
+Quaternion rotationQuaternion2(1.0, 0.0, 0.0, 0.0);
 float rotationAngle = 0.0f;
 bool swapRender = 1 ;
 
@@ -36,9 +37,10 @@ void drawText(const char* text, float x, float y, float z)
 
 void drawCubes()
 {
+
     // Cube avec rotation par matrice
     float rotationMatrix[9];
-    rotationQuaternion.toRotationMatrix3x3(rotationMatrix);
+    rotationQuaternion2.toRotationMatrix3x3(rotationMatrix);
 
     glPushMatrix();
     glTranslatef(-4.0f, 0.0f, -5.0f); // Position du Cube
@@ -80,7 +82,7 @@ void drawCubes()
 
     // Appliquer la rotation quaternion à chaque sommet
     for (int i = 0; i < 8; i++) {
-        rotationQuaternion.rotatePointWithQuaternion(vertices[i], rotationQuaternion);
+        rotationQuaternion2.rotatePointWithQuaternion(vertices[i], rotationQuaternion2);
     }
 
     for (int i = 0; i < 8; i++) {
@@ -176,8 +178,8 @@ void drawCubes()
     };
 
     for (int i = 0; i < 8; i++) {
-        rotationQuaternion.shearAndScalePointandTranslate(shearScaleTranslateVertices[i], 0.5f, 0.0f, 0.0f, 1.5f, 1.5f, 1.5f, 0.0f, 3.0f, 0.0f);
-        rotationQuaternion.rotatePointWithQuaternion(shearScaleTranslateVertices[i], rotationQuaternion);
+        rotationQuaternion2.shearAndScalePointandTranslate(shearScaleTranslateVertices[i], 0.5f, 0.0f, 0.0f, 1.5f, 1.5f, 1.5f, 0.0f, 3.0f, 0.0f);
+        rotationQuaternion2.rotatePointWithQuaternion(shearScaleTranslateVertices[i], rotationQuaternion2);
 
     }
 
@@ -561,8 +563,8 @@ void updateRotations(int value)
         rotationAngle -= 360.0f;
 
     Quaternion qIncrement(std::cos(0.5 * 0.0174533), 0.0f, std::sin(0.5 * 0.0174533), 0.0f); // 1 degree around y-axis
-    rotationQuaternion = qIncrement * rotationQuaternion;
-    rotationQuaternion = rotationQuaternion.normalize();
+    rotationQuaternion2 = qIncrement * rotationQuaternion2;
+    rotationQuaternion2 = rotationQuaternion2.normalize();
 
     glutTimerFunc(10, updateRotations, 0);
 }
