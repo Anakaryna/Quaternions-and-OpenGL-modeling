@@ -36,7 +36,7 @@ void Camera::updatePos()
         if (locked)
         {
             posx += deltaForward * (dirx/cos(anglev + deltaAngley)) * MOVE_SPEED;
-            posy = 1.5f; // Maybe Change
+            posy += deltaForward * (diry/cos(anglev + deltaAngley)) * MOVE_SPEED;
             posz += deltaForward * (dirz/cos(anglev + deltaAngley)) * MOVE_SPEED;
             posx += deltaStrafe * (dirz/cos(anglev + deltaAngley)) * MOVE_SPEED;
             posz -= deltaStrafe * (dirx/cos(anglev + deltaAngley)) * MOVE_SPEED;

@@ -229,18 +229,7 @@ void drawCubes()
 }
 
 
-// Function to create a rotation matrix around the Y-axis
 
-void createOrbitMatrix(float angle, float matrix[16])
-{
-    float cosAngle = cos(angle);
-    float sinAngle = sin(angle);
-
-    matrix[0] = cosAngle; matrix[1] = 0.0f; matrix[2] = sinAngle; matrix[3] = 0.0f;
-    matrix[4] = 0.0f;     matrix[5] = 1.0f; matrix[6] = 0.0f;     matrix[7] = 0.0f;
-    matrix[8] = -sinAngle; matrix[9] = 0.0f; matrix[10] = cosAngle; matrix[11] = 0.0f;
-    matrix[12] = 0.0f;     matrix[13] = 0.0f; matrix[14] = 0.0f;     matrix[15] = 1.0f;
-}
 
 /*
 void drawSolarSys() {
@@ -286,11 +275,13 @@ void drawSolarSys() {
     cubeMatrix.DrawSphere2(textures[SPHERE], posX3, posY3, posZ3, rotation, orbitRotation4, 3.0f, 10.0f);
 }
 */
+
+
+
 void drawSolarSys() {
     float time = glutGet(GLUT_ELAPSED_TIME) / 10.0f; // Get the elapsed time in seconds
 
     // Define speeds and sizes for each planet
-    // The speeds are arbitrary to visualize the motion
     float speedMercury = 0.004f;
     float speedVenus = 0.0015f;
     float speedEarth = 0.001f;
@@ -300,15 +291,25 @@ void drawSolarSys() {
     float speedUranus = 0.00005f;
     float speedNeptune = 0.00003f;
 
-    // Angles based on the elapsed time
-    float angleMercury = time * speedMercury;
-    float angleVenus = time * speedVenus;
-    float angleEarth = time * speedEarth;
-    float angleMars = time * speedMars;
-    float angleJupiter = time * speedJupiter;
-    float angleSaturn = time * speedSaturn;
-    float angleUranus = time * speedUranus;
-    float angleNeptune = time * speedNeptune;
+    // Initial angles for each planet
+    float initialAngleMercury = 0.0f;
+    float initialAngleVenus = 45.0f;  // 45 degrees in radians
+    float initialAngleEarth = 90.0f;  // 90 degrees in radians
+    float initialAngleMars = 135.0f;  // 135 degrees in radians
+    float initialAngleJupiter = 180.0f;  // 180 degrees in radians
+    float initialAngleSaturn = 225.0f;  // 225 degrees in radians
+    float initialAngleUranus = 270.0f;  // 270 degrees in radians
+    float initialAngleNeptune = 315.0f;  // 315 degrees in radians
+
+    // Angles based on the elapsed time and initial angles
+    float angleMercury = time * speedMercury + initialAngleMercury;
+    float angleVenus = time * speedVenus + initialAngleVenus;
+    float angleEarth = time * speedEarth + initialAngleEarth;
+    float angleMars = time * speedMars + initialAngleMars;
+    float angleJupiter = time * speedJupiter + initialAngleJupiter;
+    float angleSaturn = time * speedSaturn + initialAngleSaturn;
+    float angleUranus = time * speedUranus + initialAngleUranus;
+    float angleNeptune = time * speedNeptune + initialAngleNeptune;
 
     // Orbit rotations
     Quaternion orbitRotationMercury(cos(angleMercury / 2), 0.0f, sin(angleMercury / 2), 0.0f);
@@ -363,6 +364,13 @@ void drawSolarSys() {
     cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationUranus, radiusUranus, orbitRadiusUranus);
     cubeMatrix.DrawSphere2(textures[SPHERE], centerX, centerY, centerZ, rotation, orbitRotationNeptune, radiusNeptune, orbitRadiusNeptune);
 }
+
+
+
+
+
+
+
 
 
 
@@ -606,13 +614,15 @@ void renderScene(void) {
               cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
               0.0f, 1.0f, 0.0f);
 
-    m->DrawGround();
-    m->DrawSkybox(cam);
+
 
     if(swapRender == 1) {
+        m->DrawGround();
+        m->DrawSkybox(cam);
         // Draw cubes
         drawCubes();
         cubeMatrix.DrawSphere(textures[SPHERE], 10);
+
     } else {
         drawSolarSys();
     }

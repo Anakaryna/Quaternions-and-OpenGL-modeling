@@ -28,6 +28,7 @@ public:
     void DrawSphere(GLuint texture,float radius);  // Nouvelle méthode pour dessiner la sphère
     void SetTexture(int face, GLuint texture);
     void DrawSphere2(GLuint texture, float posX, float posY, float posZ, const Quaternion& rotation, const Quaternion& orbitRotation, float radius, float orbitRadius) ;
+
     float posx;
     float posy;
     float posz;
