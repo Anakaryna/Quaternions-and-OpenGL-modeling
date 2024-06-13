@@ -3,7 +3,7 @@
 
 #include <GL/glut.h>
 #include <SOIL/SOIL.h>
-
+#include "Quaternion.h"
 #define ANCHOR_FROM_ORIGIN 0
 #define ANCHOR_FROM_CENTER 1
 
@@ -15,6 +15,7 @@
 #define BOT 5
 #define ALL 6
 #define SPHERE 7
+#define SUN 8
 
 #define TEXTURE_SCALE 1.0f
 
@@ -26,7 +27,7 @@ public:
     void Draw();
     void DrawSphere(GLuint texture,float radius);  // Nouvelle méthode pour dessiner la sphère
     void SetTexture(int face, GLuint texture);
-    void DrawSphere2(GLuint texture, float posX, float posY, float posZ, float matrix4x4[16], float orbit_matrix4x4[16], float radius, float orbitRadius) ;
+    void DrawSphere2(GLuint texture, float posX, float posY, float posZ, const Quaternion& rotation, const Quaternion& orbitRotation, float radius, float orbitRadius) ;
     float posx;
     float posy;
     float posz;
