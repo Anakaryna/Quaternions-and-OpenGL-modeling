@@ -249,14 +249,20 @@ void Block::DrawSphere2(GLuint texture, float posX, float posY, float posZ, cons
     glTranslatef(orbitCenter[0], orbitCenter[1], orbitCenter[2]);
 
     // Apply the initial rotation to the sphere
-    rotateSphere(params, radius, rotation);
+    float matrix[16];
+    rotation.to4x4Matrix(matrix);
+    glMultMatrixf(matrix);
+
+    // Draw the sphere with the correct orientation
+    glRotatef(-90, 1.0f, 0.0f, 0.0f); // Rotate the sphere so the poles are aligned correctly
+    gluSphere(params, radius, 100, 100);
 
     glPopMatrix();
 
     gluDeleteQuadric(params);
-
-
 }
+
+
 
 
 

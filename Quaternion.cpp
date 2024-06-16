@@ -33,11 +33,24 @@ float Quaternion::dot(const Quaternion& q) const {
 }
 
 void Quaternion::to4x4Matrix(float matrix[16]) const {
-    matrix[0] = w;  matrix[1] = -x; matrix[2] = -y; matrix[3] = -z;
-    matrix[4] = x;  matrix[5] = w;  matrix[6] = -z; matrix[7] = y;
-    matrix[8] = y;  matrix[9] = z;  matrix[10] = w; matrix[11] = -x;
-    matrix[12] = z; matrix[13] = -y; matrix[14] = x; matrix[15] = w;
+    matrix[0] = 1 - 2*y*y - 2*z*z;
+    matrix[1] = 2*x*y - 2*z*w;
+    matrix[2] = 2*x*z + 2*y*w;
+    matrix[3] = 0;
+    matrix[4] = 2*x*y + 2*z*w;
+    matrix[5] = 1 - 2*x*x - 2*z*z;
+    matrix[6] = 2*y*z - 2*x*w;
+    matrix[7] = 0;
+    matrix[8] = 2*x*z - 2*y*w;
+    matrix[9] = 2*y*z + 2*x*w;
+    matrix[10] = 1 - 2*x*x - 2*y*y;
+    matrix[11] = 0;
+    matrix[12] = 0;
+    matrix[13] = 0;
+    matrix[14] = 0;
+    matrix[15] = 1;
 }
+
 
 Quaternion Quaternion::from4x4Matrix(const float matrix[16]) {
     float a = matrix[0];  // a

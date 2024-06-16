@@ -355,10 +355,6 @@ void drawSolarSys() {
 
 
 
-
-
-
-
 /** GESTION FENETRE **/
 void reshapeWindow(int w, int h)
 {
