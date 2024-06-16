@@ -3,7 +3,8 @@
 
 #include <cmath>
 #include <iostream>
-#include "Block.h"
+#include <GL/gl.h>
+
 
 class Quaternion {
 public:
@@ -54,6 +55,8 @@ public:
 
     // Appliquer du shear,Translation et scaling a un quaternion
     static void shearAndScalePointandTranslate(float point[3], float shX, float shY, float shZ, float scaleX, float scaleY, float scaleZ, float transX, float transY, float transZ);
+
+    void rotatePoint(float point[3]) const ;
 
 };
 

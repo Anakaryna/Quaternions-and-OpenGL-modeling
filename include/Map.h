@@ -14,11 +14,15 @@ class Map
         // Stockage des références aux textures
         GLuint ListeTextures[20];
         GLuint Skybox[6];
+        GLuint SolarSystemSkybox[6]; // Deuxième skybox
         void LoadTextures(void);
         void DrawGround(void);
         void DrawSkybox(Camera *cam);
+        void DrawSolarSystemSkybox(Camera *cam);
+
     protected:
     private:
+
 };
 
 #endif // MAP_H
