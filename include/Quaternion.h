@@ -58,6 +58,7 @@ public:
 
     void rotatePoint(float point[3]) const ;
 
+    void to4x4Matrix2(float *matrix) const;
 };
 
 //Application du Shear
