@@ -23,6 +23,7 @@ Quaternion rotationQuaternion(1.0, 0.0, 0.0, 0.0);
 Quaternion rotationQuaternion2(1.0, 0.0, 0.0, 0.0);
 float rotationAngle = 0.0f;
 bool swapRender = 1 ;
+int swapScenes = 0 ;
 
 
 void drawText(const char* text, float x, float y, float z)
@@ -354,6 +355,149 @@ void drawSolarSys() {
 }
 
 
+void drawSolarSysMatrix() {
+    float time = glutGet(GLUT_ELAPSED_TIME) / 10.0f;
+
+    // Define speeds and sizes for each planet
+    float speedMercury = 0.004f;
+    float speedVenus = 0.0015f;
+    float speedEarth = 0.001f;
+    float speedMars = 0.0008f;
+    float speedJupiter = 0.0002f;
+    float speedSaturn = 0.0001f;
+    float speedUranus = 0.00005f;
+    float speedNeptune = 0.00003f;
+
+    // Initial angles for each planet
+    float initialAngleMercury = 0.0f;
+    float initialAngleVenus = 45.0f;  // 45 degrees in radians
+    float initialAngleEarth = 90.0f;  // 90 degrees in radians
+    float initialAngleMars = 135.0f;  // 135 degrees in radians
+    float initialAngleJupiter = 180.0f;  // 180 degrees in radians
+    float initialAngleSaturn = 225.0f;  // 225 degrees in radians
+    float initialAngleUranus = 270.0f;  // 270 degrees in radians
+    float initialAngleNeptune = 315.0f;  // 315 degrees in radians
+
+    // Angles based on the elapsed time and initial angles
+    float angleMercury = time * speedMercury + initialAngleMercury;
+    float angleVenus = time * speedVenus + initialAngleVenus;
+    float angleEarth = time * speedEarth + initialAngleEarth;
+    float angleMars = time * speedMars + initialAngleMars;
+    float angleJupiter = time * speedJupiter + initialAngleJupiter;
+    float angleSaturn = time * speedSaturn + initialAngleSaturn;
+    float angleUranus = time * speedUranus + initialAngleUranus;
+    float angleNeptune = time * speedNeptune + initialAngleNeptune;
+
+    // Orbit rotations as quaternions
+    Quaternion orbitRotationMercury(cos(angleMercury / 2), 0.0f, sin(angleMercury / 2), 0.0f);
+    Quaternion orbitRotationVenus(cos(angleVenus / 2), 0.0f, sin(angleVenus / 2), 0.0f);
+    Quaternion orbitRotationEarth(cos(angleEarth / 2), 0.0f, sin(angleEarth / 2), 0.0f);
+    Quaternion orbitRotationMars(cos(angleMars / 2), 0.0f, sin(angleMars / 2), 0.0f);
+    Quaternion orbitRotationJupiter(cos(angleJupiter / 2), 0.0f, sin(angleJupiter / 2), 0.0f);
+    Quaternion orbitRotationSaturn(cos(angleSaturn / 2), 0.0f, sin(angleSaturn / 2), 0.0f);
+    Quaternion orbitRotationUranus(cos(angleUranus / 2), 0.0f, sin(angleUranus / 2), 0.0f);
+    Quaternion orbitRotationNeptune(cos(angleNeptune / 2), 0.0f, sin(angleNeptune / 2), 0.0f);
+
+    // Convert quaternion rotations to 4x4 matrices
+    float matrixMercury[16];
+    float matrixVenus[16];
+    float matrixEarth[16];
+    float matrixMars[16];
+    float matrixJupiter[16];
+    float matrixSaturn[16];
+    float matrixUranus[16];
+    float matrixNeptune[16];
+
+    orbitRotationMercury.to4x4Matrix(matrixMercury);
+    orbitRotationVenus.to4x4Matrix(matrixVenus);
+    orbitRotationEarth.to4x4Matrix(matrixEarth);
+    orbitRotationMars.to4x4Matrix(matrixMars);
+    orbitRotationJupiter.to4x4Matrix(matrixJupiter);
+    orbitRotationSaturn.to4x4Matrix(matrixSaturn);
+    orbitRotationUranus.to4x4Matrix(matrixUranus);
+    orbitRotationNeptune.to4x4Matrix(matrixNeptune);
+
+    // Center position for all spheres (the Sun)
+    float centerX = 0.0f;
+    float centerY = 0.0f;
+    float centerZ = 0.0f;
+
+    // Distances of the planets from the center (not to scale)
+    float orbitRadiusMercury = 10.0f;
+    float orbitRadiusVenus = 15.0f;
+    float orbitRadiusEarth = 20.0f;
+    float orbitRadiusMars = 30.0f;
+    float orbitRadiusJupiter = 50.0f;
+    float orbitRadiusSaturn = 70.0f;
+    float orbitRadiusUranus = 90.0f;
+    float orbitRadiusNeptune = 110.0f;
+
+    // Sizes of the planets
+    float radiusMercury = 0.3f;
+    float radiusVenus = 0.9f;
+    float radiusEarth = 1.0f;
+    float radiusMars = 0.5f;
+    float radiusJupiter = 2.5f;
+    float radiusSaturn = 2.0f;
+    float radiusUranus = 1.5f;
+    float radiusNeptune = 1.4f;
+    float radiusSun = 3.0f;
+
+    // Draw the Sun
+    cubeMatrix.DrawSphere2(textures[SUN], centerX, centerY, centerZ, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusSun, 0.0f);
+
+    // Draw the planets with the updated positions and rotations using matrix multiplication
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixMercury);
+    cubeMatrix.DrawSphere2(textures[MERCURY], 0.0f, 0.0f, orbitRadiusMercury, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusMercury, 0.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixVenus);
+    cubeMatrix.DrawSphere2(textures[VENUS], 0.0f, 0.0f, orbitRadiusVenus, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusVenus, 0.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixEarth);
+    cubeMatrix.DrawSphere2(textures[SPHERE], 0.0f, 0.0f, orbitRadiusEarth, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusEarth, 0.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixMars);
+    cubeMatrix.DrawSphere2(textures[MARS], 0.0f, 0.0f, orbitRadiusMars, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusMars, 0.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixJupiter);
+    cubeMatrix.DrawSphere2(textures[JUPITER], 0.0f, 0.0f, orbitRadiusJupiter, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusJupiter, 0.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixSaturn);
+    cubeMatrix.DrawSphere2(textures[SATURN], 0.0f, 0.0f, orbitRadiusSaturn, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusSaturn, 0.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixUranus);
+    cubeMatrix.DrawSphere2(textures[URANUS], 0.0f, 0.0f, orbitRadiusUranus, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusUranus, 0.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX, centerY, centerZ);
+    glMultMatrixf(matrixNeptune);
+    cubeMatrix.DrawSphere2(textures[NEPTUNE], 0.0f, 0.0f, orbitRadiusNeptune, Quaternion(1, 0, 0, 0), Quaternion(1, 0, 0, 0), radiusNeptune, 0.0f);
+    glPopMatrix();
+}
+
+
+
 
 /** GESTION FENETRE **/
 void reshapeWindow(int w, int h)
@@ -376,6 +520,9 @@ void KeyboardDown(unsigned char key, int xx, int yy)
 {
     switch(key)
     {
+        case '9' :
+            swapScenes = (swapScenes + 1) % 3 ;
+            break;
         case 'm' :
             swapRender = !swapRender ;
             break ;
@@ -568,15 +715,18 @@ void renderScene(void) {
 
 
 
-    if(swapRender == 1) {
-        m->DrawGround();
+    if(swapScenes == 0) {
+        m->DrawGround() ;
         m->DrawSkybox(cam);
         // Draw cubes
         drawCubes();
         cubeMatrix.DrawSphere(textures[SPHERE], 10);
-
-    } else {
+    } else if(swapScenes == 1){
         drawSolarSys();
+        m->DrawSolarSystemSkybox(cam);
+    }
+    else if (swapScenes == 2){
+        drawSolarSysMatrix();
         m->DrawSolarSystemSkybox(cam);
     }
 
