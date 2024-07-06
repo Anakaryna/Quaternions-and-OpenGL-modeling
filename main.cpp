@@ -413,8 +413,8 @@ void KeyboardDown(unsigned char key, int xx, int yy)
             float matrix1[16];
             float matrix2[16];
             float resultMatrix[16];
-            q1.to4x4Matrix(matrix1);
-            q2.to4x4Matrix(matrix2);
+            q1.to4x4Matrix2(matrix1);
+            q2.to4x4Matrix2(matrix2);
             Quaternion::multiplyMatrices4x4(matrix1, matrix2, resultMatrix);
 
             std::cout << "Matrice 4x4 pour q1:" << std::endl;
