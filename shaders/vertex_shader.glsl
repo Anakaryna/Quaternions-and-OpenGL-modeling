@@ -1,13 +1,16 @@
-#version 120
+#version 330 core
+layout(location = 0) in vec3 inPosition;
+layout(location = 1) in vec3 inNormal;
+layout(location = 2) in vec2 inTexCoords;
 
-attribute vec3 aPosition;
-attribute vec2 aTexCoord;
-uniform mat4 uModelViewProjectionMatrix;
+uniform mat4 uProjection;
+uniform mat4 uModel;
 
-varying vec2 vTexCoord;
+out vec3 fragNormal;
+out vec2 fragTexCoords;
 
-void main()
-{
-    gl_Position = uModelViewProjectionMatrix * vec4(aPosition, 1.0);
-    vTexCoord = aTexCoord;
+void main() {
+    gl_Position = uProjection * uModel * vec4(inPosition, 1.0);
+    fragNormal = inNormal;
+    fragTexCoords = inTexCoords;
 }

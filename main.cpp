@@ -216,7 +216,7 @@ Mesh loadObj(const char* filename) {
 
 
 
-
+/*
 // Fonction de rendu du mesh
 void renderMesh(const Mesh& mesh) {
     GLuint VAO, VBO;
@@ -245,7 +245,7 @@ void renderMesh(const Mesh& mesh) {
     glDeleteVertexArrays(1, &VAO);
 }
 
-
+*/
 
 void drawText(const char* text, float x, float y, float z) {
     glRasterPos3f(x, y, z);
@@ -1004,6 +1004,39 @@ GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_pat
     return ProgramID;
 }
 
+
+void renderMesh(const Mesh& mesh) {
+    GLuint VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, mesh.vertexCount * sizeof(Vertex), mesh.vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoords));
+    glEnableVertexAttribArray(2);
+
+    glDrawArrays(GL_TRIANGLES, 0, mesh.vertexCount);
+
+    // Debugging: Check for OpenGL errors
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        std::cerr << "OpenGL error: " << error << std::endl;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
+}
 void renderScene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -1024,6 +1057,7 @@ void renderScene(void) {
         if (!isMeshLoaded) {
             suzanneMesh = loadObj("suzanne.obj");
             isMeshLoaded = true;
+            std::cout << "Vertex count: " << suzanneMesh.vertexCount << std::endl; // Debug output
         }
 
         float projectionMatrix[16];
@@ -1032,16 +1066,18 @@ void renderScene(void) {
         float modelMatrix[16];
         generateTranslationMatrix(modelMatrix, 0.0f, 0.0f, -5.0f);
 
-        GLuint program = LoadShaders("C:/Users/Anamaria/Documents/ESGI/3rdYear/Semestre 2/Maths/Projet/Quaternions-and-OpenGL-modeling/shaders/vertex_shader.glsl",
-                                     "C:/Users/Anamaria/Documents/ESGI/3rdYear/Semestre 2/Maths/Projet/Quaternions-and-OpenGL-modeling/shaders/fragment_shader.glsl");
-
+        GLuint program = LoadShaders("shaders/vertex_shader.glsl", "shaders/fragment_shader.glsl");
         glUseProgram(program);
 
         GLuint projLoc = glGetUniformLocation(program, "uProjection");
         GLuint modelLoc = glGetUniformLocation(program, "uModel");
+        GLuint lightDirLoc = glGetUniformLocation(program, "lightDir");
+        GLuint brightnessLoc = glGetUniformLocation(program, "brightness");
 
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, projectionMatrix);
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, modelMatrix);
+        glUniform3f(lightDirLoc, 1.0f, 1.0f, -1.0f); // Set the light direction
+        glUniform1f(brightnessLoc, 30.0f); // Set the brightness (e.g., 2.0 for double the brightness)
 
         renderMesh(suzanneMesh);
 
@@ -1052,6 +1088,8 @@ void renderScene(void) {
     glutSwapBuffers();
     glutPostRedisplay(); // Ensure continuous rendering
 }
+
+
 
 
 
