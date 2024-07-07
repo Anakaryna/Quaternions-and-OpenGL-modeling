@@ -1,13 +1,23 @@
+#include <GL/glew.h>
 #include <GL/glut.h>
 #include <SOIL/SOIL.h>
 #include <cstdio>
 #include <cmath>
 #include <iomanip>
-
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <vector>
+#include <cstdint>
+#include <filesystem>
 #include "include/Camera.h"
 #include "include/Map.h"
 #include "include/Quaternion.h"
 #include "include/Block.h"
+#define TINYOBJ_LOADER_C_IMPLEMENTATION
+#include "include/tinyobj_loader_c.h"
+#include "include/matrices.h"
+
 
 // Objet Camera
 Camera *cam = new Camera();
@@ -25,9 +35,219 @@ float rotationAngle = 0.0f;
 bool swapRender = 1 ;
 int swapScenes = 0 ;
 
+struct Vertex {
+    float position[3];
+    float normal[3];
+    float texcoords[2];
+};
 
-void drawText(const char* text, float x, float y, float z)
-{
+struct Mesh {
+    Vertex* vertices;
+    uint32_t vertexCount;
+};
+
+Mesh suzanneMesh;
+bool isMeshLoaded = false;
+
+
+class attrib_t;
+
+// Code for OBJ laoder and Shader Application
+void generateProjectionMatrix(float* matrix, float fov, float aspect, float zNear, float zFar) {
+    float f = 1.0f / tan(fov / 2.0f);
+    matrix[0] = f / aspect;
+    matrix[1] = 0.0f;
+    matrix[2] = 0.0f;
+    matrix[3] = 0.0f;
+
+    matrix[4] = 0.0f;
+    matrix[5] = f;
+    matrix[6] = 0.0f;
+    matrix[7] = 0.0f;
+
+    matrix[8] = 0.0f;
+    matrix[9] = 0.0f;
+    matrix[10] = (zFar + zNear) / (zNear - zFar);
+    matrix[11] = -1.0f;
+
+    matrix[12] = 0.0f;
+    matrix[13] = 0.0f;
+    matrix[14] = (2.0f * zFar * zNear) / (zNear - zFar);
+    matrix[15] = 0.0f;
+}
+void generateTranslationMatrix(float* matrix, float x, float y, float z) {
+    matrix[0] = 1.0f;
+    matrix[1] = 0.0f;
+    matrix[2] = 0.0f;
+    matrix[3] = 0.0f;
+
+    matrix[4] = 0.0f;
+    matrix[5] = 1.0f;
+    matrix[6] = 0.0f;
+    matrix[7] = 0.0f;
+
+    matrix[8] = 0.0f;
+    matrix[9] = 0.0f;
+    matrix[10] = 1.0f;
+    matrix[11] = 0.0f;
+
+    matrix[12] = x;
+    matrix[13] = y;
+    matrix[14] = z;
+    matrix[15] = 1.0f;
+}
+void generateRotationMatrix(float* matrix, float angle, float x, float y, float z) {
+    float c = cos(angle);
+    float s = sin(angle);
+    float omc = 1.0f - c;
+
+    matrix[0] = x * x * omc + c;
+    matrix[1] = y * x * omc + z * s;
+    matrix[2] = x * z * omc - y * s;
+    matrix[3] = 0.0f;
+
+    matrix[4] = x * y * omc - z * s;
+    matrix[5] = y * y * omc + c;
+    matrix[6] = y * z * omc + x * s;
+    matrix[7] = 0.0f;
+
+    matrix[8] = x * z * omc + y * s;
+    matrix[9] = y * z * omc - x * s;
+    matrix[10] = z * z * omc + c;
+    matrix[11] = 0.0f;
+
+    matrix[12] = 0.0f;
+    matrix[13] = 0.0f;
+    matrix[14] = 0.0f;
+    matrix[15] = 1.0f;
+}
+
+#include <fstream>
+
+static void fileReaderCallback(void *ctx, const char *filename, int is_mtl, const char *obj_filename, char **data, size_t *len) {
+    std::ifstream file(filename, std::ios::binary);
+    if (!file) {
+        std::cerr << "File open failed in callback: " << filename << std::endl;
+        *data = NULL;
+        *len = 0;
+        return;
+    }
+
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    char* buffer = new char[size];
+    if (file.read(buffer, size)) {
+        *data = buffer;
+        *len = size;
+    } else {
+        std::cerr << "Error reading file: " << filename << std::endl;
+        delete[] buffer;
+        *data = NULL;
+        *len = 0;
+    }
+}
+
+
+
+
+Mesh loadObj(const char* filename) {
+    tinyobj_attrib_t attrib;
+    tinyobj_shape_t* shapes = NULL;
+    size_t num_shapes;
+    tinyobj_material_t* materials = NULL;
+    size_t num_materials;
+
+    unsigned int flags = TINYOBJ_FLAG_TRIANGULATE;
+
+    int result = tinyobj_parse_obj(&attrib, &shapes, &num_shapes, &materials, &num_materials, filename, fileReaderCallback, NULL, flags);
+
+
+    if (result != TINYOBJ_SUCCESS) {
+        std::cerr << "Failed to load/parse .obj file: " << filename << std::endl;
+        exit(1);
+    } else {
+        std::cout << "Successfully loaded .obj file: " << filename << std::endl;
+    }
+
+    std::vector<Vertex> vertices;
+
+    for (size_t i = 0; i < attrib.num_faces; i++) {
+        tinyobj_vertex_index_t idx = attrib.faces[i];
+
+        Vertex vertex;
+        vertex.position[0] = attrib.vertices[3 * idx.v_idx + 0];
+        vertex.position[1] = attrib.vertices[3 * idx.v_idx + 1];
+        vertex.position[2] = attrib.vertices[3 * idx.v_idx + 2];
+
+        if (idx.vn_idx >= 0) {
+            vertex.normal[0] = attrib.normals[3 * idx.vn_idx + 0];
+            vertex.normal[1] = attrib.normals[3 * idx.vn_idx + 1];
+            vertex.normal[2] = attrib.normals[3 * idx.vn_idx + 2];
+        }
+
+        if (idx.vt_idx >= 0) {
+            vertex.texcoords[0] = attrib.texcoords[2 * idx.vt_idx + 0];
+            vertex.texcoords[1] = attrib.texcoords[2 * idx.vt_idx + 1];
+        }
+
+        vertices.push_back(vertex);
+    }
+
+    Mesh mesh;
+    mesh.vertexCount = vertices.size();
+    mesh.vertices = new Vertex[mesh.vertexCount];
+    memcpy(mesh.vertices, vertices.data(), mesh.vertexCount * sizeof(Vertex));
+
+    tinyobj_attrib_free(&attrib);
+    tinyobj_shapes_free(shapes, num_shapes);
+    tinyobj_materials_free(materials, num_materials);
+
+    return mesh;
+}
+
+
+
+
+
+
+
+
+
+
+
+// Fonction de rendu du mesh
+void renderMesh(const Mesh& mesh) {
+    GLuint VAO, VBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, mesh.vertexCount * sizeof(Vertex), mesh.vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoords));
+    glEnableVertexAttribArray(2);
+
+    glDrawArrays(GL_TRIANGLES, 0, mesh.vertexCount);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
+}
+
+
+
+void drawText(const char* text, float x, float y, float z) {
     glRasterPos3f(x, y, z);
     for (const char* c = text; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
@@ -227,9 +447,6 @@ void drawCubes()
     drawText("Scaled and Sheared Rotation with Quaternion", -18.0f, 3.0f, -5.0f);
 
 }
-
-
-
 void drawSolarSys() {
     float time = glutGet(GLUT_ELAPSED_TIME) / 10.0f;
 
@@ -688,7 +905,6 @@ void computePos(int inutile)
     cam->updatePos();
     glutTimerFunc(10, computePos, 0);
 }
-
 void updateRotations(int value)
 {
     rotationAngle += 1.0f;
@@ -704,8 +920,90 @@ void updateRotations(int value)
 
 
 
+GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path) {
+    // Create the shaders
+    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-/** AFFICHAGE **/
+    // Read the Vertex Shader code from the file
+    std::string VertexShaderCode;
+    std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+    if (VertexShaderStream.is_open()) {
+        std::stringstream sstr;
+        sstr << VertexShaderStream.rdbuf();
+        VertexShaderCode = sstr.str();
+        VertexShaderStream.close();
+    } else {
+        printf("Impossible to open %s. Are you in the right directory?\n", vertex_file_path);
+        getchar();
+        return 0;
+    }
+
+    // Read the Fragment Shader code from the file
+    std::string FragmentShaderCode;
+    std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+    if (FragmentShaderStream.is_open()) {
+        std::stringstream sstr;
+        sstr << FragmentShaderStream.rdbuf();
+        FragmentShaderCode = sstr.str();
+        FragmentShaderStream.close();
+    }
+
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+
+    // Compile Vertex Shader
+    printf("Compiling shader : %s\n", vertex_file_path);
+    char const * VertexSourcePointer = VertexShaderCode.c_str();
+    glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
+    glCompileShader(VertexShaderID);
+
+    // Check Vertex Shader
+    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+    glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if (InfoLogLength > 0) {
+        std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
+        glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+        printf("%s\n", &VertexShaderErrorMessage[0]);
+    }
+
+    // Compile Fragment Shader
+    printf("Compiling shader : %s\n", fragment_file_path);
+    char const * FragmentSourcePointer = FragmentShaderCode.c_str();
+    glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
+    glCompileShader(FragmentShaderID);
+
+    // Check Fragment Shader
+    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+    glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if (InfoLogLength > 0) {
+        std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
+        glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+        printf("%s\n", &FragmentShaderErrorMessage[0]);
+    }
+
+    // Link the program
+    printf("Linking program\n");
+    GLuint ProgramID = glCreateProgram();
+    glAttachShader(ProgramID, VertexShaderID);
+    glAttachShader(ProgramID, FragmentShaderID);
+    glLinkProgram(ProgramID);
+
+    // Check the program
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    if (InfoLogLength > 0) {
+        std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
+        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+        printf("%s\n", &ProgramErrorMessage[0]);
+    }
+
+    glDeleteShader(VertexShaderID);
+    glDeleteShader(FragmentShaderID);
+
+    return ProgramID;
+}
+
 void renderScene(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -713,26 +1011,49 @@ void renderScene(void) {
               cam->posx + cam->dirx, cam->posy + cam->diry, cam->posz + cam->dirz,
               0.0f, 1.0f, 0.0f);
 
-
-
-    if(swapScenes == 0) {
-        m->DrawGround() ;
+    if (swapScenes == 0) {
+        m->DrawGround();
         m->DrawSkybox(cam);
         // Draw cubes
         drawCubes();
         cubeMatrix.DrawSphere(textures[SPHERE], 10);
-    } else if(swapScenes == 1){
+    } else if (swapScenes == 1) {
         drawSolarSys();
         m->DrawSolarSystemSkybox(cam);
-    }
-    else if (swapScenes == 2){
-        drawSolarSysMatrix();
+    } else if (swapScenes == 2) {
+        if (!isMeshLoaded) {
+            suzanneMesh = loadObj("suzanne.obj");
+            isMeshLoaded = true;
+        }
+
+        float projectionMatrix[16];
+        generateProjectionMatrix(projectionMatrix, 45.0f * M_PI / 180.0f, 1.0f, 0.1f, 100.0f);
+
+        float modelMatrix[16];
+        generateTranslationMatrix(modelMatrix, 0.0f, 0.0f, -5.0f);
+
+        GLuint program = LoadShaders("C:/Users/Anamaria/Documents/ESGI/3rdYear/Semestre 2/Maths/Projet/Quaternions-and-OpenGL-modeling/shaders/vertex_shader.glsl",
+                                     "C:/Users/Anamaria/Documents/ESGI/3rdYear/Semestre 2/Maths/Projet/Quaternions-and-OpenGL-modeling/shaders/fragment_shader.glsl");
+
+        glUseProgram(program);
+
+        GLuint projLoc = glGetUniformLocation(program, "uProjection");
+        GLuint modelLoc = glGetUniformLocation(program, "uModel");
+
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, projectionMatrix);
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, modelMatrix);
+
+        renderMesh(suzanneMesh);
+
+        glUseProgram(0);
         m->DrawSolarSystemSkybox(cam);
     }
 
     glutSwapBuffers();
     glutPostRedisplay(); // Ensure continuous rendering
 }
+
+
 
 
 
@@ -871,12 +1192,20 @@ void LoadTextures()
 
 
 int main(int argc, char **argv) {
+    std::cout << "Current path is " << std::filesystem::current_path() << '\n';
     /** CREATION FENETRE **/
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowPosition(100, 100);
     glutInitWindowSize(320, 320);
     glutCreateWindow("Quaternions");
+
+    /** INIT GLEW **/
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        return -1;
+    }
 
     /** FONCTIONS GLUT **/
     glutDisplayFunc(renderScene);
@@ -907,6 +1236,7 @@ int main(int argc, char **argv) {
 
     return 1;
 }
+
 
 
 
