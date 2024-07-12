@@ -1226,9 +1226,6 @@ void LoadTextures()
 
 
 
-
-
-
 int main(int argc, char **argv) {
     std::cout << "Current path is " << std::filesystem::current_path() << '\n';
     /** CREATION FENETRE **/
