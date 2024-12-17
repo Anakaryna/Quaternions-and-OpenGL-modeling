@@ -52,7 +52,7 @@ void Camera::updatePos()
         }
     }
 }
-/*
+
 void Camera::orienterCam(int x, int y)
 {
     if (xOrigin >= 0)
@@ -81,34 +81,7 @@ void Camera::orienterCam(int x, int y)
         dirz = rotatedForward.z;
     }
 }
-*/
-void Camera::orienterCam(int x, int y)
-{
-    if (xOrigin >= 0)
-    {
-        // Calcul de l'angle horizontal
-        deltaAnglex = (x - xOrigin) * SENSIBILITY;
-        // Correction de l'angle ]-Pi; Pi[
-        while (deltaAnglex + angleh > M_PI)
-            deltaAnglex -= M_PI * 2;
-        while (deltaAnglex + angleh < -M_PI)
-            deltaAnglex += M_PI * 2;
 
-        // Calcul de l'angle vertical
-        deltaAngley = (y - yOrigin) * SENSIBILITY;
-        // Limitation de l'angle (limite haute)
-        if (deltaAngley + anglev > M_PI_2)
-            deltaAngley = M_PI_2 - anglev - 0.01f;
-        // Limitation de l'angle (limite basse)
-        if (deltaAngley + anglev < -M_PI_2)
-            deltaAngley = -M_PI_2 - anglev + 0.01f;
-
-        // Mis à jour de la caméra
-        dirx = sin(angleh + deltaAnglex)*cos(anglev + deltaAngley);
-        diry = -sin(anglev + deltaAngley);
-        dirz = -cos(angleh + deltaAnglex)*cos(anglev + deltaAngley);
-    }
-}
 
 
 void Camera::releaseCam()

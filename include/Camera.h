@@ -2,10 +2,7 @@
 #define CAMERA_H
 
 #define MOVE_SPEED 0.2f
-/*
 #define SENSIBILITY 0.00005f
- */
-#define SENSIBILITY 0.005f
 #include "Quaternion.h"
 
 class Camera
